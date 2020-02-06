@@ -26,6 +26,12 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -339,5 +345,3 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 /Temp
-/Library
-/Logs
