@@ -345,3 +345,15 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 /Temp
+
+# Unity3D generated meta files
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Unity3D generated file on crash reports
+sysinfo.txt
+
+# Builds
+*.apk
+*.unitypackage
