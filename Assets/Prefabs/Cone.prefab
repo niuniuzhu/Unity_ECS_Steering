@@ -70,8 +70,8 @@ MonoBehaviour:
   right:
     x: 0
     y: 0
-  speed: 0.1
-  maxSpeed: 0.3
+  speed: 0.2
+  maxSpeed: 0.4
   maxForce: 5
   maxTurnRate: 3.1415925
   mass: 1

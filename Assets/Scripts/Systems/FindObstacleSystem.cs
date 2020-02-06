@@ -5,7 +5,6 @@ using Unity.Mathematics;
 
 namespace Steering
 {
-	[DisableAutoCreation]
 	public class FindObstacleSystem : JobComponentSystem
 	{
 		struct TargetInfo
@@ -28,9 +27,8 @@ namespace Steering
 			targetEntityArray.Dispose();
 			targetEntityDataArray.Dispose();
 
-			var jobHandle = Entities.ForEach( ( Entity vehicle, ref EntityData entityData, ref VehicleData vehicleData ) =>
+			var jobHandle = Entities.ForEach( ( Entity vehicle, ref EntityData entityData, ref VehicleData vehicleData, ref DynamicBuffer<ObstacleElement> obstacles ) =>
 			 {
-				 var obstacles = Environment.world.EntityManager.GetBuffer<ObstacleElement>( vehicle );
 				 obstacles.Clear();
 
 				 var detectDistance = vehicleData.detectionBoxLength;
@@ -41,19 +39,19 @@ namespace Steering
 
 					 var to = targetInfo.position - entityData.position;
 
-					// the bounding radius of the other is taken into account by adding it to the range
-					float totalRange = detectDistance + targetInfo.radius;
+					 // the bounding radius of the other is taken into account by adding it to the range
+					 float totalRange = detectDistance + targetInfo.radius;
 
-					// if entity within range, tag for further consideration.
-					// (working in distance-squared space to avoid sqrts)
-					if ( math.lengthsq( to ) < totalRange * totalRange )
+					 // if entity within range, tag for further consideration.
+					 // (working in distance-squared space to avoid sqrts)
+					 if ( math.lengthsq( to ) < totalRange * totalRange )
 					 {
 						 obstacles.Add( new ObstacleElement() { obstacle = targetInfo.entity } );
 					 }
 				 }
 			 } ).Schedule( inputDeps );
 
-			targetInfos.Dispose();
+			targetInfos.Dispose( jobHandle );
 
 			return jobHandle;
 		}

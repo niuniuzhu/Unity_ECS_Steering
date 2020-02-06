@@ -81,6 +81,7 @@
     <Compile Include="Assets\Scripts\Systems\FindWallSystem.cs" />
     <Compile Include="Assets\Scripts\Systems\InputSystem.cs" />
     <Compile Include="Assets\Scripts\Systems\SteeringSystem.cs" />
+    <Compile Include="Assets\Scripts\Systems\SteeringSystem_Old.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>

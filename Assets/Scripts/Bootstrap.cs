@@ -114,9 +114,9 @@ public class Bootstrap : MonoBehaviour
 	private static Mesh CreateMesh()
 	{
 		var vertices = new Vector3[3];
-		vertices[0] = new Vector3( -0.5f, 0, -0.5f );
+		vertices[0] = new Vector3( -0.25f, 0, -0.25f );
 		vertices[1] = new Vector3( 0f, 0, 0.5f );
-		vertices[2] = new Vector3( 0.5f, 0, -0.5f );
+		vertices[2] = new Vector3( 0.25f, 0, -0.25f );
 		var normals = new Vector3[3];
 		normals[0] = new Vector3( 0, 1, 0 );
 		normals[1] = new Vector3( 0, 1, 0 );

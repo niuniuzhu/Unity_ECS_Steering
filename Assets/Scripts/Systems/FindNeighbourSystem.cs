@@ -5,7 +5,6 @@ using Unity.Mathematics;
 
 namespace Steering
 {
-	[DisableAutoCreation]
 	public class FindNeighbourSystem : JobComponentSystem
 	{
 		struct TargetInfo
@@ -17,7 +16,7 @@ namespace Steering
 
 		protected override JobHandle OnUpdate( JobHandle inputDeps )
 		{
-			var targetQuery = this.GetEntityQuery( typeof( VehicleData ), typeof( EntityData ) );
+			var targetQuery = this.GetEntityQuery( typeof( EntityData ), typeof( VehicleData ) );
 			var targetEntityArray = targetQuery.ToEntityArray( Allocator.TempJob );
 			var targetEntityDataArray = targetQuery.ToComponentDataArray<EntityData>( Allocator.TempJob );
 
@@ -28,32 +27,34 @@ namespace Steering
 			targetEntityArray.Dispose();
 			targetEntityDataArray.Dispose();
 
-			var jobHandle= Entities.WithAll<VehicleData>().ForEach( ( Entity vehicle, ref EntityData entityData, ref MovingData movingData ) =>
-			{
-				var neighbours = Environment.world.EntityManager.GetBuffer<NeighbourElement>( vehicle );
-				neighbours.Clear();
+			var jobHandle = Entities.WithAll<VehicleData>().ForEach( ( Entity vehicle, ref EntityData entityData, ref MovingData movingData, ref DynamicBuffer<NeighbourElement> neighbours ) =>
+			 {
+				 neighbours.Clear();
 
-				var viewDistance = movingData.viewDistance;
+				 var viewDistance = movingData.viewDistance;
+				 var count = targetInfos.Length;
+				 for ( int i = 0; i < count; i++ )
+				 {
+					 var targetInfo = targetInfos[i];
 
-				for ( int i = 0; i < targetInfos.Length; i++ )
-				{
-					var targetInfo = targetInfos[i];
+					 if ( targetInfo.entity == vehicle )
+						 continue;
 
-					var to = targetInfo.position - entityData.position;
+					 var to = targetInfo.position - entityData.position;
 
-					// the bounding radius of the other is taken into account by adding it to the range
-					float totalRange = viewDistance + targetInfo.radius;
+					 // the bounding radius of the other is taken into account by adding it to the range
+					 float totalRange = viewDistance + targetInfo.radius;
 
-					// if entity within range, tag for further consideration.
-					// (working in distance-squared space to avoid sqrts)
-					if ( targetInfo.entity != vehicle && ( math.lengthsq( to ) < totalRange * totalRange ) )
-					{
-						neighbours.Add( new NeighbourElement() { neighbour = targetInfo.entity } );
-					}
-				}
-			} ).Schedule( inputDeps );
+					 // if entity within range, tag for further consideration.
+					 // (working in distance-squared space to avoid sqrts)
+					 if ( math.lengthsq( to ) < totalRange * totalRange )
+					 {
+						 neighbours.Add( new NeighbourElement() { neighbour = targetInfo.entity } );
+					 }
+				 }
+			 } ).Schedule( inputDeps );
 
-			targetInfos.Dispose();
+			targetInfos.Dispose( jobHandle );
 
 			return jobHandle;
 		}
