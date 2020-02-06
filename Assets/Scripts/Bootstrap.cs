@@ -6,75 +6,91 @@ using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
 
-//class MyCustomBootStrap : ICustomBootstrap
-//{
-//	public bool Initialize( string defaultWorldName )
-//	{
-//		Debug.Log( "Executing bootstrap" );
-//		var world = new World( "Custom world" );
-//		World.DefaultGameObjectInjectionWorld = world;
-//		var systems = DefaultWorldInitialization.GetAllSystems( WorldSystemFilterFlags.Default );
-
-//		DefaultWorldInitialization.AddSystemsToRootLevelSystemGroups( world, systems );
-//		ScriptBehaviourUpdateOrder.UpdatePlayerLoop( world );
-//		return true;
-//	}
-//}
-
 public class Bootstrap : MonoBehaviour
 {
-	public GameObject prefab;
+	//vehicles
+	public GameObject vehiclePrefab;
+	[HideInInspector]
 	public Mesh mesh;
 	public Material material;
 	public int amount;
 
-	//[RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.AfterSceneLoad )]
+	//walls
+	public GameObject wallPrefab;
+	public float2 minXY;
+	public float2 maxXY;
+	public float wallBorderSize;
+
 	private void Start()
 	{
 		this.mesh = CreateMesh();
+		this.CreateWalls();
 	}
 
 	private void OnDestroy()
 	{
-		Object.Destroy( this.mesh );
+		Destroy( this.mesh );
 	}
 
 	private void Update()
 	{
-		if ( Input.GetKeyDown( KeyCode.Z ) )
-		{
-			this.Spawn();
-		}
 		if ( Input.GetKeyDown( KeyCode.X ) )
 		{
 			this.SpawnPrefab();
 		}
 	}
-
-	private void Spawn()
+	private void CreateWalls()
 	{
+		float2[] wallDatas = new[]
+		{
+			//right
+			new float2(this.maxXY.x+this.wallBorderSize, this.minXY.y),
+			new float2(this.minXY.x-this.wallBorderSize, this.minXY.y-this.wallBorderSize),
+			//bottom
+			new float2(this.maxXY.x+this.wallBorderSize, this.maxXY.y),
+			new float2(this.maxXY.x, this.minXY.y),
+			//left
+			new float2(this.minXY.x-this.wallBorderSize, this.maxXY.y),
+			new float2(this.maxXY.x+this.wallBorderSize, this.maxXY.y+this.wallBorderSize),
+			//top
+			new float2(this.minXY.x-this.wallBorderSize, this.minXY.y),
+			new float2(this.minXY.x, this.maxXY.y),
+		};
+
 		var manager = Environment.world.EntityManager;
 
-		var archeType = manager.CreateArchetype(
-			typeof( RenderMesh ),
-			typeof( LocalToWorld ),
-			typeof( Translation ),
-			typeof( Rotation )
-		);
+		var setting = GameObjectConversionSettings.FromWorld( Environment.world, new BlobAssetStore() );
+		var entityPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy( this.wallPrefab, setting );
 
-		var charactors = new NativeArray<Entity>( this.amount, Allocator.Temp );
-		manager.CreateEntity( archeType, charactors );
+		var wallCount = wallDatas.Length / 2;
+		var walls = new NativeArray<Entity>( wallCount, Allocator.Temp );
+		manager.Instantiate( entityPrefab, walls );
+		manager.DestroyEntity( entityPrefab );
 
-		for ( int i = 0; i < this.amount; i++ )
+		for ( int i = 0; i < wallCount; i++ )
 		{
-			var position = new Vector3( UnityEngine.Random.Range( -10f, 10f ), 0, UnityEngine.Random.Range( -4f, 4f ) );
-			var rotation = quaternion.AxisAngle( new float3( 0, 1, 0 ), math.radians( UnityEngine.Random.Range( 0, 360 ) ) );
-			manager.SetComponentData( charactors[i], new Translation { Value = position } );
-			manager.SetComponentData( charactors[i], new Rotation { Value = rotation } );
-			manager.SetSharedComponentData( charactors[i], new RenderMesh { mesh = this.mesh, material = this.material, castShadows = UnityEngine.Rendering.ShadowCastingMode.Off } );
+			var wall = walls[i];
+			var from = wallDatas[i * 2 + 0];
+			var to = wallDatas[i * 2 + 1];
+			var size = from - to;
+			var normal = math.normalize( size );
+			normal = new float2( normal.y, -normal.x );
+			var center = ( from + to ) / 2.0f;
+
+			manager.SetComponentData( wall, new WallData
+			{
+				from = from,
+				to = to,
+				size = size,
+				normal = normal,
+				center = center
+			} );
+			manager.SetComponentData( wall, new Translation { Value = new float3( center.x, 0, center.y ) } );
+			manager.SetComponentData( wall, new Rotation { Value = quaternion.identity } );
+			manager.AddComponentData( wall, new NonUniformScale { Value = new float3( size.x, 1, size.y ) } );
 		}
 
-		charactors.Dispose();
+		walls.Dispose();
 	}
 
 	private void SpawnPrefab()
@@ -82,33 +98,37 @@ public class Bootstrap : MonoBehaviour
 		var manager = Environment.world.EntityManager;
 
 		var setting = GameObjectConversionSettings.FromWorld( Environment.world, new BlobAssetStore() );
-		var entityPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy( this.prefab, setting );
+		var entityPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy( this.vehiclePrefab, setting );
 
-		var charactors = new NativeArray<Entity>( this.amount, Allocator.Temp );
-		manager.Instantiate( entityPrefab, charactors );
-
+		var vehicles = new NativeArray<Entity>( this.amount, Allocator.Temp );
+		manager.Instantiate( entityPrefab, vehicles );
 		manager.DestroyEntity( entityPrefab );
 
 		for ( int i = 0; i < this.amount; i++ )
 		{
-			var position = new Vector3( UnityEngine.Random.Range( -10f, 10f ), 0, UnityEngine.Random.Range( -4f, 4f ) );
+			var vehicle = vehicles[i];
+
+			var radius = manager.GetComponentData<EntityData>( vehicle ).radius;
+			var wallBorderSize = this.wallBorderSize * 0.5f;
+			var position = new Vector3( UnityEngine.Random.Range( this.minXY.x + wallBorderSize + radius, this.maxXY.x - wallBorderSize - radius ), 0,
+				UnityEngine.Random.Range( this.minXY.y + wallBorderSize + radius, this.maxXY.y - wallBorderSize - radius ) );
 			var rotation = quaternion.AxisAngle( new float3( 0, 1, 0 ), math.radians( UnityEngine.Random.Range( 0, 360 ) ) );
 			var forward = math.forward( rotation );
 
-			manager.AddBuffer<NeighbourElement>( charactors[i] );
-			manager.AddBuffer<ObstacleElement>( charactors[i] );
-			manager.SetComponentData( charactors[i], new Translation { Value = position } );
-			manager.SetComponentData( charactors[i], new Rotation { Value = rotation } );
-			manager.AddSharedComponentData( charactors[i], new RenderMesh { mesh = this.mesh, material = this.material, castShadows = UnityEngine.Rendering.ShadowCastingMode.Off } );
-			manager.SetComponentData( charactors[i], new EntityData { position = new float2( position.x, position.z ) } );
-			var movingData = manager.GetComponentData<MovingData>( charactors[i] );
+			manager.AddBuffer<NeighbourElement>( vehicle );
+			manager.AddBuffer<ObstacleElement>( vehicle );
+			manager.SetComponentData( vehicle, new Translation { Value = position } );
+			manager.SetComponentData( vehicle, new Rotation { Value = rotation } );
+			manager.AddSharedComponentData( vehicle, new RenderMesh { mesh = this.mesh, material = this.material, castShadows = UnityEngine.Rendering.ShadowCastingMode.Off } );
+			manager.SetComponentData( vehicle, new EntityData { position = new float2( position.x, position.z ), radius = radius } );
+			var movingData = manager.GetComponentData<MovingData>( vehicle );
 			movingData.forward = new float2( forward.x, forward.z );
 			movingData.right = new float2( forward.z, -forward.x );
 			movingData.velocity = movingData.forward;
-			manager.SetComponentData( charactors[i], movingData );
+			manager.SetComponentData( vehicle, movingData );
 		}
 
-		charactors.Dispose();
+		vehicles.Dispose();
 	}
 
 	private static Mesh CreateMesh()

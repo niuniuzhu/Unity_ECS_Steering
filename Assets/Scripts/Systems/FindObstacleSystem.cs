@@ -46,7 +46,8 @@ namespace Steering
 					 // (working in distance-squared space to avoid sqrts)
 					 if ( math.lengthsq( to ) < totalRange * totalRange )
 					 {
-						 obstacles.Add( new ObstacleElement() { obstacle = targetInfo.entity } );
+						 if ( obstacles.Length < 10 )
+							 obstacles.Add( new ObstacleElement() { obstacle = targetInfo.entity } );
 					 }
 				 }
 			 } ).Schedule( inputDeps );

@@ -159,12 +159,14 @@ namespace Steering
 		public float2 wallDetectionFeeler2;
 	}
 
+	[InternalBufferCapacity( 10 )]
 	[GenerateAuthoringComponent]
 	public struct NeighbourElement : IBufferElementData
 	{
 		public Entity neighbour;
 	}
 
+	[InternalBufferCapacity( 10 )]
 	[GenerateAuthoringComponent]
 	public struct ObstacleElement : IBufferElementData
 	{

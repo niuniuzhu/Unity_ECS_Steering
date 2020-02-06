@@ -49,7 +49,8 @@ namespace Steering
 					 // (working in distance-squared space to avoid sqrts)
 					 if ( math.lengthsq( to ) < totalRange * totalRange )
 					 {
-						 neighbours.Add( new NeighbourElement() { neighbour = targetInfo.entity } );
+						 if ( neighbours.Length < 10 )
+							 neighbours.Add( new NeighbourElement() { neighbour = targetInfo.entity } );
 					 }
 				 }
 			 } ).Schedule( inputDeps );

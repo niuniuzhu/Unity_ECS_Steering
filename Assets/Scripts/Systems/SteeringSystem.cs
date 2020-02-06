@@ -19,13 +19,14 @@ namespace Steering
 		protected override JobHandle OnUpdate( JobHandle inputDeps )
 		{
 			var dt = Time.DeltaTime;
+			var random = Environment.random;
 
 			var jobHandle = Entities.ForEach( ( Entity vehicle, ref Translation translation, ref Rotation rotation,
 				   ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData,
 				   ref DynamicBuffer<NeighbourElement> neighbours, ref DynamicBuffer<ObstacleElement> obstacles ) =>
 			 {
 				 //计算速度
-				 var steeringForce = Calculate( ref entityData, ref movingData, ref vehicleData, ref neighbours, ref obstacles );
+				 var steeringForce = Calculate( ref entityData, ref movingData, ref vehicleData, ref neighbours, ref obstacles, random );
 				 var acceleration = steeringForce / movingData.mass;
 				 movingData.velocity += acceleration * dt;
 
@@ -59,13 +60,13 @@ namespace Steering
 		/// <param name="vehicle">智能体</param>
 		/// <returns>合操纵力</returns>
 		public static float2 Calculate( ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData,
-			ref DynamicBuffer<NeighbourElement> neighbours, ref DynamicBuffer<ObstacleElement> obstacles )
+			ref DynamicBuffer<NeighbourElement> neighbours, ref DynamicBuffer<ObstacleElement> obstacles, Random random )
 		{
 			var steeringForce = float2.zero;
 			switch ( vehicleData.summingMethod )
 			{
 				case SummingMethod.WeightedAverage:
-					steeringForce = CalculateWeightedSum( ref entityData, ref movingData, ref vehicleData, ref neighbours, ref obstacles );
+					steeringForce = CalculateWeightedSum( ref entityData, ref movingData, ref vehicleData, ref neighbours, ref obstacles, random );
 					break;
 			}
 
@@ -77,13 +78,13 @@ namespace Steering
 		/// </summary>
 		/// <returns>合操纵力</returns>
 		private static float2 CalculateWeightedSum( ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData,
-			ref DynamicBuffer<NeighbourElement> neighbours, ref DynamicBuffer<ObstacleElement> obstacles )
+			ref DynamicBuffer<NeighbourElement> neighbours, ref DynamicBuffer<ObstacleElement> obstacles, Random random )
 		{
 			var steeringForce = float2.zero;
 
 			if ( ( vehicleData.flags & Behaviors.Wander ) > 0 )
 			{
-				//steeringForce += Wander( ref entityData, ref movingData, ref vehicleData ) * vehicleData.weightWander;
+				steeringForce += Wander( ref entityData, ref movingData, ref vehicleData, random ) * vehicleData.weightWander;
 			}
 
 			if ( ( vehicleData.flags & Behaviors.Seek ) > 0 )
@@ -168,11 +169,11 @@ namespace Steering
 		/// </summary>
 		/// <param name="vehicle">智能体</param>
 		/// <returns>操纵力</returns>
-		private static float2 Wander( ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData )
+		private static float2 Wander( ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData, Random random )
 		{
 			// reproject this new vector back on to a unit circle
 			// then increase the length of the vector to the same as the radius of the wander circle
-			float angle = Environment.random.NextFloat( 0f, math.PI * 2 );
+			float angle = random.NextFloat( 0f, math.PI * 2 );
 			var onUnitCircle = new float2( math.cos( angle ), math.sin( angle ) );
 
 			vehicleData.wanderTarget = onUnitCircle * vehicleData.wanderRadius;

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 9007561832718460696}
   - component: {fileID: 2513071525747079500}
   m_Layer: 0
-  m_Name: Cone
+  m_Name: Vehicle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48,7 +48,7 @@ MonoBehaviour:
   position:
     x: 0
     y: 0
-  radius: 1
+  radius: 0.5
 --- !u!114 &9007561832718460696
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,12 +70,12 @@ MonoBehaviour:
   right:
     x: 0
     y: 0
-  speed: 0.2
-  maxSpeed: 0.4
+  speed: 0.3
+  maxSpeed: 0.5
   maxForce: 5
   maxTurnRate: 3.1415925
   mass: 1
-  viewDistance: 4
+  viewDistance: 2
 --- !u!114 &2513071525747079500
 MonoBehaviour:
   m_ObjectHideFlags: 0
