@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Bootstrap.cs" />
+    <Compile Include="Assets\Scripts\ComponentDatas\CellData.cs" />
     <Compile Include="Assets\Scripts\ComponentDatas\EntityData.cs" />
     <Compile Include="Assets\Scripts\ComponentDatas\MovingData.cs" />
     <Compile Include="Assets\Scripts\ComponentDatas\ObstacleData.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Assets\Scripts\Systems\FindObstacleSystem.cs" />
     <Compile Include="Assets\Scripts\Systems\FindWallSystem.cs" />
     <Compile Include="Assets\Scripts\Systems\InputSystem.cs" />
+    <Compile Include="Assets\Scripts\Systems\QuadrantSystem.cs" />
     <Compile Include="Assets\Scripts\Systems\SteeringSystem.cs" />
     <Compile Include="Assets\Scripts\Systems\SteeringSystem_Old.cs" />
     <Reference Include="Unity.Timeline.Editor">

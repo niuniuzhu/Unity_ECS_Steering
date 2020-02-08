@@ -23,10 +23,10 @@ namespace Steering
 
 			var jobHandle = Entities.ForEach( ( Entity vehicle, ref Translation translation, ref Rotation rotation,
 				   ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData,
-				   ref DynamicBuffer<NeighbourElement> neighbours, ref DynamicBuffer<ObstacleElement> obstacles ) =>
+				   in DynamicBuffer<NeighbourElement> neighbours, in DynamicBuffer<ObstacleElement> obstacles ) =>
 			 {
 				 //计算速度
-				 var steeringForce = Calculate( ref entityData, ref movingData, ref vehicleData, ref neighbours, ref obstacles, random );
+				 var steeringForce = Calculate( ref entityData, ref movingData, ref vehicleData, in neighbours, in obstacles, random );
 				 var acceleration = steeringForce / movingData.mass;
 				 movingData.velocity += acceleration * dt;
 
@@ -60,13 +60,13 @@ namespace Steering
 		/// <param name="vehicle">智能体</param>
 		/// <returns>合操纵力</returns>
 		public static float2 Calculate( ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData,
-			ref DynamicBuffer<NeighbourElement> neighbours, ref DynamicBuffer<ObstacleElement> obstacles, Random random )
+			in DynamicBuffer<NeighbourElement> neighbours, in DynamicBuffer<ObstacleElement> obstacles, Random random )
 		{
 			var steeringForce = float2.zero;
 			switch ( vehicleData.summingMethod )
 			{
 				case SummingMethod.WeightedAverage:
-					steeringForce = CalculateWeightedSum( ref entityData, ref movingData, ref vehicleData, ref neighbours, ref obstacles, random );
+					steeringForce = CalculateWeightedSum( ref entityData, ref movingData, ref vehicleData, in neighbours, in obstacles, random );
 					break;
 			}
 
@@ -78,7 +78,7 @@ namespace Steering
 		/// </summary>
 		/// <returns>合操纵力</returns>
 		private static float2 CalculateWeightedSum( ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData,
-			ref DynamicBuffer<NeighbourElement> neighbours, ref DynamicBuffer<ObstacleElement> obstacles, Random random )
+			in DynamicBuffer<NeighbourElement> neighbours, in DynamicBuffer<ObstacleElement> obstacles, Random random )
 		{
 			var steeringForce = float2.zero;
 

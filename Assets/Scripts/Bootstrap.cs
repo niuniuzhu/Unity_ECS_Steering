@@ -5,6 +5,7 @@ using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
+using Environment = Steering.Environment;
 
 public class Bootstrap : MonoBehaviour
 {
@@ -21,9 +22,20 @@ public class Bootstrap : MonoBehaviour
 	public float2 maxXY;
 	public float wallBorderSize;
 
+	//quadrant
+	public int numCellX;
+	public int numCellZ;
+
 	private void Start()
 	{
+		Environment.minXY = this.minXY;
+		Environment.maxXY = this.maxXY;
+		Environment.numCell = new int2( this.numCellX, this.numCellZ );
+		var worldSize = Environment.maxXY - Environment.minXY;
+		Environment.cellSize = new float2( worldSize.x / Environment.numCell.x, worldSize.y / Environment.numCell.y );
+
 		this.mesh = CreateMesh();
+		this.CreateCells();
 		this.CreateWalls();
 	}
 
@@ -38,7 +50,34 @@ public class Bootstrap : MonoBehaviour
 		{
 			this.SpawnPrefab();
 		}
+		this.DebugDrawCells();
 	}
+
+	private void CreateCells()
+	{
+		var manager = Environment.world.EntityManager;
+
+		var archeType = manager.CreateArchetype(
+			typeof( CellData )
+		);
+
+		int k = 0;
+		for ( int i = 0; i < Environment.numCell.y; i++ )
+		{
+			for ( int j = 0; j < Environment.numCell.x; j++ )
+			{
+				var entity = manager.CreateEntity( archeType );
+				manager.SetComponentData( entity, new CellData
+				{
+					index = k++,
+					center = new float2( Environment.minXY.x + Environment.cellSize.x * 0.5f + Environment.cellSize.x * j,
+					Environment.minXY.y + Environment.cellSize.y * 0.5f + Environment.cellSize.y * i ),
+					extends = Environment.cellSize * 0.5f
+				} );
+			}
+		}
+	}
+
 	private void CreateWalls()
 	{
 		float2[] wallDatas = new[]
@@ -147,5 +186,24 @@ public class Bootstrap : MonoBehaviour
 		triangles[2] = 2;
 		var mesh = new Mesh { vertices = vertices, normals = normals, triangles = triangles };
 		return mesh;
+	}
+
+	private void DebugDrawCells()
+	{
+		var manager = Environment.world.EntityManager;
+		var cellQuery = manager.CreateEntityQuery( typeof( CellData ) );
+		var cellDataArray = cellQuery.ToComponentDataArray<CellData>( Allocator.TempJob );
+		var count = cellDataArray.Length;
+		for ( int i = 0; i < count; i++ )
+		{
+			var cellData = cellDataArray[i];
+			var min = cellData.center - cellData.extends;
+			var max = cellData.center + cellData.extends;
+			Debug.DrawLine( new Vector3( min.x, 0, min.y ), new Vector3( min.x, 0, max.y ) );
+			Debug.DrawLine( new Vector3( min.x, 0, min.y ), new Vector3( max.x, 0, min.y ) );
+			Debug.DrawLine( new Vector3( max.x, 0, max.y ), new Vector3( min.x, 0, max.y ) );
+			Debug.DrawLine( new Vector3( max.x, 0, max.y ), new Vector3( max.x, 0, min.y ) );
+		}
+		cellDataArray.Dispose();
 	}
 }

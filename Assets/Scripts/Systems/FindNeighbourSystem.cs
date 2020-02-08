@@ -5,57 +5,85 @@ using Unity.Mathematics;
 
 namespace Steering
 {
+	[UpdateAfter( typeof( QuadrantSystem ) )]
 	public class FindNeighbourSystem : JobComponentSystem
 	{
-		struct TargetInfo
-		{
-			public Entity entity;
-			public float2 position;
-			public float radius;
-		}
-
 		protected override JobHandle OnUpdate( JobHandle inputDeps )
 		{
-			var targetQuery = this.GetEntityQuery( typeof( EntityData ), typeof( VehicleData ) );
-			var targetEntityArray = targetQuery.ToEntityArray( Allocator.TempJob );
-			var targetEntityDataArray = targetQuery.ToComponentDataArray<EntityData>( Allocator.TempJob );
+			var cellSize = Environment.cellSize;
+			var offset = Environment.minXY;
+			var numCell = Environment.numCell;
+			var cellEntityElementHashMap = QuadrantSystem.cellEntityElementHashMap;
+			var cellIndexArray = new NativeArray<int>( Environment.numCell.x * Environment.numCell.y, Allocator.TempJob );
 
-			var targetInfos = new NativeArray<TargetInfo>( targetEntityArray.Length, Allocator.TempJob );
-			for ( int i = 0; i < targetInfos.Length; i++ )
-				targetInfos[i] = new TargetInfo { entity = targetEntityArray[i], position = targetEntityDataArray[i].position, radius = targetEntityDataArray[i].radius };
-
-			targetEntityArray.Dispose();
-			targetEntityDataArray.Dispose();
-
-			var jobHandle = Entities.WithAll<VehicleData>().ForEach( ( Entity vehicle, ref EntityData entityData, ref MovingData movingData, ref DynamicBuffer<NeighbourElement> neighbours ) =>
+			var jobHandle = Entities.WithAll<VehicleData>().WithReadOnly( cellEntityElementHashMap ).
+				ForEach( ( Entity vehicle, ref DynamicBuffer<NeighbourElement> neighbours, in EntityData entityData, in MovingData movingData ) =>
 			 {
 				 neighbours.Clear();
 
 				 var viewDistance = movingData.viewDistance;
-				 var count = targetInfos.Length;
-				 for ( int i = 0; i < count; i++ )
+				 //用视野作为半径的圆的外接矩形
+				 var topLeft = entityData.position - viewDistance;
+				 var bottomRight = entityData.position + viewDistance;
+
+				 var minIndex = QuadrantSystem.GetCellIndex( topLeft, offset, numCell, cellSize );
+				 var maxIndex = QuadrantSystem.GetCellIndex( bottomRight, offset, numCell, cellSize );
+				 var size = maxIndex - minIndex;
+
+				 var numIndices = ( size.x + 1 ) * ( size.y + 1 );
+				 int k = 0;
+				 for ( int i = minIndex.y; i <= maxIndex.y; i++ )
+					 for ( int j = minIndex.x; j <= maxIndex.x; j++ )
+						 cellIndexArray[k++] = j + i * numCell.x;
+
+				 for ( int i = 0; i < numIndices; i++ )
 				 {
-					 var targetInfo = targetInfos[i];
+					 //var it = cellEntityElementHashMap.GetValuesForKey( _cellIndexArray[i] );
+					 //while ( it.MoveNext() )
+					 //{
+					 // var cellEntityElement = it.Current;
+					 // if ( cellEntityElement.entity == vehicle )
+					 //	 continue;
 
-					 if ( targetInfo.entity == vehicle )
-						 continue;
+					 // var to = cellEntityElement.position - entityData.position;
 
-					 var to = targetInfo.position - entityData.position;
+					 // // the bounding radius of the other is taken into account by adding it to the range
+					 // float totalRange = viewDistance + cellEntityElement.radius;
 
-					 // the bounding radius of the other is taken into account by adding it to the range
-					 float totalRange = viewDistance + targetInfo.radius;
-
-					 // if entity within range, tag for further consideration.
-					 // (working in distance-squared space to avoid sqrts)
-					 if ( math.lengthsq( to ) < totalRange * totalRange )
+					 // // if entity within range, tag for further consideration.
+					 // // (working in distance-squared space to avoid sqrts)
+					 // if ( math.lengthsq( to ) < totalRange * totalRange )
+					 // {
+					 //	 if ( neighbours.Length < 10 )
+					 //		 neighbours.Add( new NeighbourElement() { neighbour = cellEntityElement.entity } );
+					 // }
+					 //}
+					 if ( cellEntityElementHashMap.TryGetFirstValue( cellIndexArray[i], out var cellEntityElement, out var nativeMultiHashMapIterator ) )
 					 {
-						 if ( neighbours.Length < 10 )
-							 neighbours.Add( new NeighbourElement() { neighbour = targetInfo.entity } );
+						 do
+						 {
+							 if ( cellEntityElement.entity == vehicle )
+								 continue;
+
+							 var to = cellEntityElement.position - entityData.position;
+
+							 // the bounding radius of the other is taken into account by adding it to the range
+							 float totalRange = viewDistance + cellEntityElement.radius;
+
+							 // if entity within range, tag for further consideration.
+							 // (working in distance-squared space to avoid sqrts)
+							 if ( math.lengthsq( to ) < totalRange * totalRange )
+							 {
+								 if ( neighbours.Length < 10 )
+									 neighbours.Add( new NeighbourElement() { neighbour = cellEntityElement.entity } );
+							 }
+						 }
+						 while ( cellEntityElementHashMap.TryGetNextValue( out cellEntityElement, ref nativeMultiHashMapIterator ) );
 					 }
 				 }
 			 } ).Schedule( inputDeps );
 
-			targetInfos.Dispose( jobHandle );
+			cellIndexArray.Dispose( jobHandle );
 
 			return jobHandle;
 		}

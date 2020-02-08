@@ -154,15 +154,18 @@ MonoBehaviour:
     type: 3}
   mesh: {fileID: 0}
   material: {fileID: 2100000, guid: d19435ea5dc565f498d4367ce7becd00, type: 2}
-  amount: 100
+  amount: 5000
   wallPrefab: {fileID: 6150156303732565994, guid: 63522f519cf85dd4eb2e9c7d17286b21,
     type: 3}
   minXY:
-    x: -6
-    y: -2.5
+    x: -12.5
+    y: -6
   maxXY:
-    x: 6
-    y: 2.5
+    x: 12.5
+    y: 6
+  wallBorderSize: 1.5
+  numCellX: 15
+  numCellZ: 9
 --- !u!4 &279089596
 Transform:
   m_ObjectHideFlags: 0
