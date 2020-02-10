@@ -22,7 +22,7 @@ namespace Steering
 					Entities.ForEach( ( Entity vehicle, ref VehicleData vehicleData ) =>
 					 {
 						 vehicleData.targetPosition = new Unity.Mathematics.float2( hit.Position.x, hit.Position.z );
-						 SteeringSystem.SeekOn( vehicle );
+						 SteeringSystem.ArriveOn( vehicle );
 					 } );
 				}
 			}

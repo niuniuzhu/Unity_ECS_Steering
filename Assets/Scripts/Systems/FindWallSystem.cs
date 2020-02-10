@@ -9,7 +9,6 @@ namespace Steering
 	{
 		struct WallInfo
 		{
-			public Entity entity;
 			public float2 from;
 			public float2 to;
 			public float2 normal;
@@ -18,20 +17,17 @@ namespace Steering
 		protected override JobHandle OnUpdate( JobHandle inputDeps )
 		{
 			var targetQuery = this.GetEntityQuery( typeof( WallData ) );
-			var targetEntityArray = targetQuery.ToEntityArray( Allocator.TempJob );
 			var targetEntityDataArray = targetQuery.ToComponentDataArray<WallData>( Allocator.TempJob );
 
-			var targetInfos = new NativeArray<WallInfo>( targetEntityArray.Length, Allocator.TempJob );
+			var targetInfos = new NativeArray<WallInfo>( targetEntityDataArray.Length, Allocator.TempJob );
 			for ( var i = 0; i < targetInfos.Length; i++ )
 				targetInfos[i] = new WallInfo
 				{
-					entity = targetEntityArray[i],
 					from = targetEntityDataArray[i].from,
 					to = targetEntityDataArray[i].to,
 					normal = targetEntityDataArray[i].normal
 				};
 
-			targetEntityArray.Dispose();
 			targetEntityDataArray.Dispose();
 
 			var wallDetectionFeelers = new NativeArray<float2>( 3, Allocator.TempJob );
@@ -80,7 +76,6 @@ namespace Steering
 								 distToClosestIP = distToThisIP;
 								 vehicleData.wallDetectionData = new VehicleData.WallDetectionData
 								 {
-									 wall = targetInfo.entity,
 									 wallNormal = targetInfo.normal,
 									 closestPoint = point,
 									 wallDetectionFeelerIndex = flr

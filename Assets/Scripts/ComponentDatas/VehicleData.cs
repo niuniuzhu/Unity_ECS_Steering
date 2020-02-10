@@ -6,13 +6,6 @@ namespace Steering
 	[GenerateAuthoringComponent]
 	public struct VehicleData : IComponentData
 	{
-		public enum Deceleration
-		{
-			Normal,
-			Slow,
-			Fast
-		}
-
 		[System.Flags]
 		public enum Behaviors
 		{
@@ -118,21 +111,12 @@ namespace Steering
 		/// </summary>
 		public float2 targetPosition;
 		/// <summary>
-		/// 用于arrive等行为的减速度
+		/// arrive行为开始减速的距离
 		/// </summary>
-		public float decelerationTweaker;
+		public float decelerationDistance;
 
 		public float2 offset;
 
-		public Deceleration deceleration;
-		/// <summary>
-		/// 徘徊目标点
-		/// </summary>
-		public float2 wanderTarget;
-		/// <summary>
-		/// 避障中使用的检测盒的长度
-		/// </summary>
-		public float detectionBoxLength;
 		/// <summary>
 		/// 墙壁检测中使用的触须长度
 		/// </summary>
@@ -171,5 +155,7 @@ namespace Steering
 	public struct ObstacleElement : IBufferElementData
 	{
 		public Entity obstacle;
+		public float2 position;
+		public float radius;
 	}
 }

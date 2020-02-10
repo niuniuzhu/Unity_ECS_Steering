@@ -154,7 +154,7 @@ MonoBehaviour:
     type: 3}
   mesh: {fileID: 0}
   material: {fileID: 2100000, guid: d19435ea5dc565f498d4367ce7becd00, type: 2}
-  amount: 5000
+  amount: 1
   wallPrefab: {fileID: 6150156303732565994, guid: 63522f519cf85dd4eb2e9c7d17286b21,
     type: 3}
   minXY:
@@ -166,6 +166,13 @@ MonoBehaviour:
   wallBorderSize: 1.5
   numCellX: 15
   numCellZ: 9
+  obstacleMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  obstacleMaterial: {fileID: 2100000, guid: c22c16f9f28e1e5409775262597f58af, type: 2}
+  numObstacles: 5
+  minObstacleRadius: 0.5
+  maxObstacleRadius: 1.5
+  obstacleMinSeparation: 2.5
+  obstacleBorder: 0.2
 --- !u!4 &279089596
 Transform:
   m_ObjectHideFlags: 0

@@ -5,9 +5,8 @@ namespace Steering
 {
 	public static class Environment
 	{
-		public readonly static World world = World.DefaultGameObjectInjectionWorld;
-
-		public readonly static Random random = new Random( ( uint )new System.Random().Next() );
+		public static World world;
+		public static Random random;
 
 		public static float2 minXY;
 		public static float2 maxXY;

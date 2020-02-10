@@ -1,4 +1,5 @@
 ﻿using Steering;
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -26,8 +27,19 @@ public class Bootstrap : MonoBehaviour
 	public int numCellX;
 	public int numCellZ;
 
+	//obstacles
+	public Mesh obstacleMesh;
+	public Material obstacleMaterial;
+	public int numObstacles;
+	public float minObstacleRadius;
+	public float maxObstacleRadius;
+	public float obstacleMinSeparation;
+	public float obstacleBorder;
+
 	private void Start()
 	{
+		Environment.world = World.DefaultGameObjectInjectionWorld;
+		Environment.random.InitState( ( uint )new System.Random().Next() );
 		Environment.minXY = this.minXY;
 		Environment.maxXY = this.maxXY;
 		Environment.numCell = new int2( this.numCellX, this.numCellZ );
@@ -37,6 +49,7 @@ public class Bootstrap : MonoBehaviour
 		this.mesh = CreateMesh();
 		this.CreateCells();
 		this.CreateWalls();
+		this.CreateObstacles();
 	}
 
 	private void OnDestroy()
@@ -132,6 +145,80 @@ public class Bootstrap : MonoBehaviour
 		walls.Dispose();
 	}
 
+	private void CreateObstacles()
+	{
+		var manager = Environment.world.EntityManager;
+
+		var archeType = manager.CreateArchetype(
+			typeof( LocalToWorld ),
+			typeof( Translation ),
+			typeof( Scale ),
+			typeof( ObstacleData )
+		);
+
+		var obstacleDatas = new List<ObstacleData>();
+		for ( int i = 0; i < this.numObstacles; ++i )
+		{
+			// keep creating tiddlywinks until we find one that doesn't overlap
+			// any others. Sometimes this can get into an endless loop because the
+			// obstacle has nowhere to fit. We test for this case and exit accordingly
+			var maxTries = 2000;
+			var isOverlapped = true;
+			for ( int numTries = 0; isOverlapped; numTries++ )
+			{
+				if ( numTries > maxTries )
+					return;
+
+				var radius = Environment.random.NextFloat( this.minObstacleRadius, this.maxObstacleRadius );
+
+				// TODO: inefficient - do the check before creating the obstacle.
+				var position = new float2(
+					Environment.random.NextFloat( this.minXY.x + radius + this.obstacleBorder, this.maxXY.x - radius - this.obstacleBorder ),
+					Environment.random.NextFloat( this.minXY.y + radius + this.obstacleBorder, this.maxXY.y - radius - this.obstacleBorder ) );
+
+				var obstacleData = new ObstacleData
+				{
+					position = position,
+					radius = radius
+				};
+
+				if ( !IsOverlapped( obstacleData, obstacleDatas, this.obstacleMinSeparation ) )
+				{
+					obstacleDatas.Add( obstacleData );
+					isOverlapped = false;
+
+					var entity = manager.CreateEntity( archeType );
+					manager.SetComponentData( entity, obstacleData );
+					manager.SetComponentData( entity, new Translation { Value = new float3( position.x, 0, position.y ) } );
+					manager.SetComponentData( entity, new Scale { Value = radius * 2 } );
+					manager.AddSharedComponentData( entity, new RenderMesh
+					{
+						mesh = this.obstacleMesh,
+						material = this.obstacleMaterial,
+						castShadows = UnityEngine.Rendering.ShadowCastingMode.Off,
+						receiveShadows = false
+					} );
+				}
+			}
+		}
+	}
+
+	private static bool IsOverlapped( in ObstacleData obstacleData, List<ObstacleData> conOb, float minSeparation )
+	{
+		foreach ( var it in conOb )
+		{
+			if ( GeometryUtil.TwoCirclesOverlapped(
+				obstacleData.position,
+				obstacleData.radius + minSeparation,
+				it.position,
+				it.radius ) )
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private void SpawnPrefab()
 	{
 		var manager = Environment.world.EntityManager;
@@ -158,13 +245,21 @@ public class Bootstrap : MonoBehaviour
 			manager.AddBuffer<ObstacleElement>( vehicle );
 			manager.SetComponentData( vehicle, new Translation { Value = position } );
 			manager.SetComponentData( vehicle, new Rotation { Value = rotation } );
-			manager.AddSharedComponentData( vehicle, new RenderMesh { mesh = this.mesh, material = this.material, castShadows = UnityEngine.Rendering.ShadowCastingMode.Off } );
+			manager.AddSharedComponentData( vehicle, new RenderMesh
+			{
+				mesh = this.mesh,
+				material = this.material,
+				castShadows = UnityEngine.Rendering.ShadowCastingMode.Off,
+				receiveShadows = false
+			} );
 			manager.SetComponentData( vehicle, new EntityData { position = new float2( position.x, position.z ), radius = radius } );
 			var movingData = manager.GetComponentData<MovingData>( vehicle );
 			movingData.forward = new float2( forward.x, forward.z );
 			movingData.right = new float2( forward.z, -forward.x );
-			movingData.velocity = movingData.forward;
+			//movingData.velocity = movingData.forward * movingData.maxSpeed;
 			manager.SetComponentData( vehicle, movingData );
+
+			SteeringSystem.ObstacleAvoidanceOn( vehicle );
 		}
 
 		vehicles.Dispose();

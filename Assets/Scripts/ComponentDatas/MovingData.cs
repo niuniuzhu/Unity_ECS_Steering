@@ -11,7 +11,15 @@ namespace Steering
 		/// </summary>
 		public float2 velocity;
 		/// <summary>
-		/// 前向量
+		/// 前向量平滑系数
+		/// </summary>
+		public float forwardSmooth;
+		/// <summary>
+		/// 确实的前向量
+		/// </summary>
+		public float2 realForward;
+		/// <summary>
+		/// 当前平滑的前向量
 		/// </summary>
 		public float2 forward;
 		/// <summary>

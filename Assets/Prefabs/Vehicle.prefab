@@ -64,17 +64,21 @@ MonoBehaviour:
   velocity:
     x: 0
     y: 0
+  forwardSmooth: 4
+  realForward:
+    x: 0
+    y: 0
   forward:
     x: 0
     y: 0
   right:
     x: 0
     y: 0
-  speed: 0.3
-  maxSpeed: 0.5
+  speed: 0
+  maxSpeed: 2
   maxForce: 5
-  maxTurnRate: 3.1415925
-  mass: 1
+  maxTurnRate: 3.141592
+  mass: 0.1
   viewDistance: 2
 --- !u!114 &2513071525747079500
 MonoBehaviour:
@@ -92,7 +96,7 @@ MonoBehaviour:
   wanderDistance: 1
   wanderJitterPerSec: 2
   waypointSeekDistSquared: 4
-  summingMethod: 0
+  summingMethod: 1
   weightSeparation: 1
   weightCohesion: 2
   weightAlignment: 1
@@ -113,15 +117,10 @@ MonoBehaviour:
   targetPosition:
     x: 0
     y: 0
-  decelerationTweaker: 0
+  decelerationDistance: 0.5
   offset:
     x: 0
     y: 0
-  deceleration: 0
-  wanderTarget:
-    x: 0
-    y: 0
-  detectionBoxLength: 1
   wallDetectionFeelerLength: 1
   flags: 0
   wallDetectionFeeler0:

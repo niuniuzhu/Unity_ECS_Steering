@@ -134,7 +134,7 @@ namespace Steering
 
 			if ( ( vehicleData.flags & Behaviors.Arrive ) > 0 )
 			{
-				steeringForce += Arrive( ref entityData, ref movingData, ref vehicleData, vehicleData.targetPosition, vehicleData.deceleration ) * vehicleData.weightArrive;
+				steeringForce += Arrive( ref entityData, ref movingData, ref vehicleData, vehicleData.targetPosition ) * vehicleData.weightArrive;
 			}
 
 			if ( ( vehicleData.flags & Behaviors.Pursuit ) > 0 )
@@ -234,7 +234,7 @@ namespace Steering
 
 			if ( ( vehicleData.flags & Behaviors.Arrive ) > 0 )
 			{
-				force = Arrive( ref entityData, ref movingData, ref vehicleData, vehicleData.targetPosition, vehicleData.deceleration ) * vehicleData.weightArrive;
+				force = Arrive( ref entityData, ref movingData, ref vehicleData, vehicleData.targetPosition ) * vehicleData.weightArrive;
 				if ( !AccumulateForce( ref movingData, ref steeringForce, force ) ) { return steeringForce; }
 			}
 
@@ -373,7 +373,7 @@ namespace Steering
 
 			if ( ( vehicleData.flags & Behaviors.Arrive ) > 0 && Environment.random.NextFloat() < SteeringSettings.PrArrive )
 			{
-				steeringForce += Arrive( ref entityData, ref movingData, ref vehicleData, vehicleData.targetPosition, vehicleData.deceleration ) * vehicleData.weightArrive / SteeringSettings.PrArrive;
+				steeringForce += Arrive( ref entityData, ref movingData, ref vehicleData, vehicleData.targetPosition ) * vehicleData.weightArrive / SteeringSettings.PrArrive;
 				var b2 = steeringForce == float2.zero;
 				if ( b2.x && b2.y )
 					return Truncate( steeringForce, movingData.maxForce );
@@ -453,27 +453,27 @@ namespace Steering
 		/// 计算智能体到达给定点并以零速度到达该点的转向力
 		/// </summary>
 		/// <returns>操纵力</returns>
-		private static float2 Arrive( ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData, float2 targetPos, Deceleration deceleration )
+		private static float2 Arrive( ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData, float2 targetPos )
 		{
 			var toTarget = targetPos - entityData.position;
 			var dist = math.length( toTarget );
 
-			if ( dist > 0 )
-			{
-				// calculate the speed required to reach the target given the desired
-				// deceleration
-				var speed = dist / ( ( int )deceleration * vehicleData.decelerationTweaker );
+			//if ( dist > 0 )
+			//{
+			//	// calculate the speed required to reach the target given the desired
+			//	// deceleration
+			//	var speed = dist / vehicleData.decelerationTweaker;
 
-				// make sure the velocity does not exceed the max
-				speed = speed > movingData.maxSpeed ? speed : movingData.maxSpeed;
+			//	// make sure the velocity does not exceed the max
+			//	speed = speed > movingData.maxSpeed ? speed : movingData.maxSpeed;
 
-				// from here proceed just like Seek except we don't need to normalize
-				// the ToTarget vector because we have already gone to the trouble
-				// of calculating its length: dist.
-				var desiredVelocity = toTarget * speed / dist;
+			//	// from here proceed just like Seek except we don't need to normalize
+			//	// the ToTarget vector because we have already gone to the trouble
+			//	// of calculating its length: dist.
+			//	var desiredVelocity = toTarget * speed / dist;
 
-				return desiredVelocity - movingData.velocity;
-			}
+			//	return desiredVelocity - movingData.velocity;
+			//}
 			return float2.zero;
 		}
 
@@ -548,10 +548,10 @@ namespace Steering
 			float angle = Environment.random.NextFloat( 0f, math.PI * 2 );
 			var onUnitCircle = new float2( math.cos( angle ), math.sin( angle ) );
 
-			vehicleData.wanderTarget = onUnitCircle * vehicleData.wanderRadius;
+			var wanderTarget = onUnitCircle * vehicleData.wanderRadius;
 
 			// move the target into a position WanderDist in front of the agent
-			var target = vehicleData.wanderTarget + new float2( vehicleData.wanderDistance, 0 );
+			var target = wanderTarget + new float2( vehicleData.wanderDistance, 0 );
 
 			// project the target into world space
 			target = TransformUtil.ToWorldSpace( entityData.position, movingData.forward, movingData.right ).Apply( target );
@@ -567,7 +567,7 @@ namespace Steering
 		private static float2 ObstacleAvoidance( ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData, ref DynamicBuffer<ObstacleElement> obstacles )
 		{
 			// the detection box length is proportional to the agent's velocity
-			vehicleData.detectionBoxLength = SteeringSettings.MinDetectionBoxLength + ( movingData.speed / movingData.maxSpeed ) * SteeringSettings.MinDetectionBoxLength;
+			var detectionBoxLength = SteeringSettings.MinDetectionBoxLength + ( movingData.speed / movingData.maxSpeed ) * SteeringSettings.MinDetectionBoxLength;
 
 			// this will keep track of the closest intersecting obstacle (CIB)
 			var closestIntersectingObstacle = Entity.Null;
@@ -637,7 +637,7 @@ namespace Steering
 
 				// the closer the agent is to an object, the stronger the
 				// steering force should be
-				var multiplier = 1.0f + ( vehicleData.detectionBoxLength - localPosOfClosestObstacle.x ) / vehicleData.detectionBoxLength;
+				var multiplier = 1.0f + ( detectionBoxLength - localPosOfClosestObstacle.x ) / detectionBoxLength;
 
 				// apply a braking force proportional to the obstacles distance from the _vehicle.
 				const float BrakingWeight = 0.2f;
@@ -663,6 +663,7 @@ namespace Steering
 			if ( vehicleData.wallDetectionData.wall != Entity.Null )
 			{
 				float2 wallDetectionFeeler;
+
 				// calculate by what distance the projected position of the agent will overshoot the wall
 				switch ( vehicleData.wallDetectionData.wallDetectionFeelerIndex )
 				{
@@ -730,7 +731,7 @@ namespace Steering
 			midPoint = ( aPos + bPos ) / 2.0f;
 
 			// then steer to Arrive at it
-			return Arrive( ref entityData, ref movingData, ref vehicleData, midPoint, Deceleration.Fast );
+			return Arrive( ref entityData, ref movingData, ref vehicleData, midPoint );
 		}
 
 		/// <summary>
@@ -770,7 +771,7 @@ namespace Steering
 			if ( distToClosest == float.MaxValue )
 				return Evade( ref entityData, ref movingData, ref hunterData, ref hunterMovingData );
 			else
-				return Arrive( ref entityData, ref movingData, ref vehicleData, bestHidingSpot, Deceleration.Fast );
+				return Arrive( ref entityData, ref movingData, ref vehicleData, bestHidingSpot );
 		}
 
 		/// <summary>
