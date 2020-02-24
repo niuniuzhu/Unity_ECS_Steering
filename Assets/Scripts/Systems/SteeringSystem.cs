@@ -12,10 +12,6 @@ namespace Steering
 	[UpdateAfter( typeof( FindWallSystem ) )]
 	public class SteeringSystem : JobComponentSystem
 	{
-		protected override void OnDestroy()
-		{
-		}
-
 		protected override JobHandle OnUpdate( JobHandle inputDeps )
 		{
 			var dt = Time.DeltaTime;
@@ -384,80 +380,61 @@ namespace Steering
 			return TransformUtil.ToWorldSpace( float2.zero, movingData.forward, movingData.right ).Apply( localSteeringForce );
 		}
 
-		public static void FleeOn( Entity vehicle )
+		public static void FleeOn( ref VehicleData vehicleData )
 		{
-			var vehicleData = Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle );
 			vehicleData.flags |= Behaviors.Flee;
-			Environment.world.EntityManager.SetComponentData( vehicle, vehicleData );
 		}
 
-		public static void SeekOn( Entity vehicle )
+		public static void SeekOn( ref VehicleData vehicleData )
 		{
-			var vehicleData = Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle );
 			vehicleData.flags |= Behaviors.Seek;
-			Environment.world.EntityManager.SetComponentData( vehicle, vehicleData );
 		}
 
-		public static void ArriveOn( Entity vehicle )
+		public static void ArriveOn( ref VehicleData vehicleData )
 		{
-			var vehicleData = Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle );
 			vehicleData.flags |= Behaviors.Arrive;
-			Environment.world.EntityManager.SetComponentData( vehicle, vehicleData );
 		}
 
-		public static void WanderOn( Entity vehicle )
+		public static void WanderOn( ref VehicleData vehicleData )
 		{
-			var vehicleData = Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle );
 			vehicleData.flags |= Behaviors.Wander;
-			Environment.world.EntityManager.SetComponentData( vehicle, vehicleData );
 		}
 
-		public static void ObstacleAvoidanceOn( Entity vehicle )
+		public static void ObstacleAvoidanceOn( ref VehicleData vehicleData )
 		{
-			var vehicleData = Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle );
 			vehicleData.flags |= Behaviors.ObstacleAvoidance;
-			Environment.world.EntityManager.SetComponentData( vehicle, vehicleData );
 		}
 
-		public static void FleeOff( Entity vehicle )
+		public static void FleeOff( ref VehicleData vehicleData )
 		{
-			var vehicleData = Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle );
 			vehicleData.flags &= ~Behaviors.Flee;
 		}
 
-		public static void SeekOff( Entity vehicle )
+		public static void SeekOff( ref VehicleData vehicleData )
 		{
-			var vehicleData = Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle );
 			vehicleData.flags &= ~Behaviors.Seek;
-			Environment.world.EntityManager.SetComponentData( vehicle, vehicleData );
 		}
 
-		public static void ArriveOff( Entity vehicle )
+		public static void ArriveOff( ref VehicleData vehicleData )
 		{
-			var vehicleData = Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle );
 			vehicleData.flags &= ~Behaviors.Arrive;
-			Environment.world.EntityManager.SetComponentData( vehicle, vehicleData );
 		}
 
-		public static void WanderOff( Entity vehicle )
+		public static void WanderOff( ref VehicleData vehicleData )
 		{
-			var vehicleData = Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle );
 			vehicleData.flags &= ~Behaviors.Wander;
-			Environment.world.EntityManager.SetComponentData( vehicle, vehicleData );
 		}
 
-		public static void ObstacleAvoidanceOff( Entity vehicle )
+		public static void ObstacleAvoidanceOff( ref VehicleData vehicleData )
 		{
-			var vehicleData = Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle );
 			vehicleData.flags &= ~Behaviors.ObstacleAvoidance;
-			Environment.world.EntityManager.SetComponentData( vehicle, vehicleData );
 		}
 
-		public static bool IsFleeOn( Entity vehicle ) => ( Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle ).flags & Behaviors.Flee ) > 0;
-		public static bool IsSeekOn( Entity vehicle ) => ( Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle ).flags & Behaviors.Seek ) > 0;
-		public static bool IsArriveOn( Entity vehicle ) => ( Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle ).flags & Behaviors.Arrive ) > 0;
-		public static bool IsWanderOn( Entity vehicle ) => ( Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle ).flags & Behaviors.Wander ) > 0;
-		public static bool IsObstacleAvoidanceOn( Entity vehicle ) => ( Environment.world.EntityManager.GetComponentData<VehicleData>( vehicle ).flags & Behaviors.ObstacleAvoidance ) > 0;
+		public static bool IsFleeOn( in VehicleData vehicleData ) => ( vehicleData.flags & Behaviors.Flee ) > 0;
+		public static bool IsSeekOn( in VehicleData vehicleData ) => ( vehicleData.flags & Behaviors.Seek ) > 0;
+		public static bool IsArriveOn( in VehicleData vehicleData ) => ( vehicleData.flags & Behaviors.Arrive ) > 0;
+		public static bool IsWanderOn( in VehicleData vehicleData ) => ( vehicleData.flags & Behaviors.Wander ) > 0;
+		public static bool IsObstacleAvoidanceOn( in VehicleData vehicleData ) => ( vehicleData.flags & Behaviors.ObstacleAvoidance ) > 0;
 		#endregion
 	}
 }

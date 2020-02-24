@@ -144,14 +144,12 @@ namespace Steering
 	}
 
 	[InternalBufferCapacity( 10 )]
-	[GenerateAuthoringComponent]
 	public struct NeighbourElement : IBufferElementData
 	{
 		public Entity neighbour;
 	}
 
 	[InternalBufferCapacity( 10 )]
-	[GenerateAuthoringComponent]
 	public struct ObstacleElement : IBufferElementData
 	{
 		public Entity obstacle;

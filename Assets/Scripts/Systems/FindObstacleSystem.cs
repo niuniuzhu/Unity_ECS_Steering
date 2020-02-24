@@ -7,12 +7,6 @@ namespace Steering
 {
 	public class FindObstacleSystem : JobComponentSystem
 	{
-		struct TargetInfo
-		{
-			public float2 position;
-			public float radius;
-		}
-
 		protected override JobHandle OnUpdate( JobHandle inputDeps )
 		{
 			var targetQuery = this.GetEntityQuery( typeof( ObstacleData ) );

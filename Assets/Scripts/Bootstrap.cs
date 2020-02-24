@@ -38,6 +38,8 @@ public class Bootstrap : MonoBehaviour
 
 	private void Start()
 	{
+		Application.targetFrameRate = 60;
+
 		Environment.world = World.DefaultGameObjectInjectionWorld;
 		Environment.random.InitState( ( uint )new System.Random().Next() );
 		Environment.minXY = this.minXY;
@@ -57,12 +59,18 @@ public class Bootstrap : MonoBehaviour
 		Destroy( this.mesh );
 	}
 
+	public void OnAmountTextEnd( string text )
+	{
+		this.amount = int.Parse( text );
+	}
+
+	public void OnSpawnButtonClick()
+	{
+		this.SpawnPrefab();
+	}
+
 	private void Update()
 	{
-		if ( Input.GetKeyDown( KeyCode.X ) )
-		{
-			this.SpawnPrefab();
-		}
 		this.DebugDrawCells();
 	}
 
@@ -111,8 +119,10 @@ public class Bootstrap : MonoBehaviour
 
 		var manager = Environment.world.EntityManager;
 
-		var setting = GameObjectConversionSettings.FromWorld( Environment.world, new BlobAssetStore() );
+		var blobAssetStore = new BlobAssetStore();
+		var setting = GameObjectConversionSettings.FromWorld( Environment.world, blobAssetStore );
 		var entityPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy( this.wallPrefab, setting );
+		blobAssetStore.Dispose();
 
 		var wallCount = wallDatas.Length / 2;
 		var walls = new NativeArray<Entity>( wallCount, Allocator.Temp );
@@ -152,6 +162,8 @@ public class Bootstrap : MonoBehaviour
 		var archeType = manager.CreateArchetype(
 			typeof( LocalToWorld ),
 			typeof( Translation ),
+			typeof( RenderBounds ),
+			typeof( WorldRenderBounds ),
 			typeof( Scale ),
 			typeof( ObstacleData )
 		);
@@ -221,11 +233,12 @@ public class Bootstrap : MonoBehaviour
 
 	private void SpawnPrefab()
 	{
-		var manager = Environment.world.EntityManager;
-
-		var setting = GameObjectConversionSettings.FromWorld( Environment.world, new BlobAssetStore() );
+		var blobAssetStore = new BlobAssetStore();
+		var setting = GameObjectConversionSettings.FromWorld( Environment.world, blobAssetStore );
 		var entityPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy( this.vehiclePrefab, setting );
+		blobAssetStore.Dispose();
 
+		var manager = Environment.world.EntityManager;
 		var vehicles = new NativeArray<Entity>( this.amount, Allocator.Temp );
 		manager.Instantiate( entityPrefab, vehicles );
 		manager.DestroyEntity( entityPrefab );
@@ -252,6 +265,8 @@ public class Bootstrap : MonoBehaviour
 				castShadows = UnityEngine.Rendering.ShadowCastingMode.Off,
 				receiveShadows = false
 			} );
+			manager.AddComponent<RenderBounds>( vehicle );
+			manager.AddComponent<WorldRenderBounds>( vehicle );
 			manager.SetComponentData( vehicle, new EntityData { position = new float2( position.x, position.z ), radius = radius } );
 			var movingData = manager.GetComponentData<MovingData>( vehicle );
 			movingData.forward = new float2( forward.x, forward.z );
@@ -259,7 +274,8 @@ public class Bootstrap : MonoBehaviour
 			//movingData.velocity = movingData.forward * movingData.maxSpeed;
 			manager.SetComponentData( vehicle, movingData );
 
-			SteeringSystem.ObstacleAvoidanceOn( vehicle );
+			var vehicleData = manager.GetComponentData<VehicleData>( vehicle );
+			SteeringSystem.ObstacleAvoidanceOn( ref vehicleData );
 		}
 
 		vehicles.Dispose();
