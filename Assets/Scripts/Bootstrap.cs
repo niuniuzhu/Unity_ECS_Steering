@@ -276,6 +276,7 @@ public class Bootstrap : MonoBehaviour
 
 			var vehicleData = manager.GetComponentData<VehicleData>( vehicle );
 			SteeringSystem.ObstacleAvoidanceOn( ref vehicleData );
+			manager.SetComponentData( vehicle, vehicleData );
 		}
 
 		vehicles.Dispose();

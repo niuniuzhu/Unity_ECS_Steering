@@ -114,9 +114,6 @@
     <Reference Include="Unity.Entities.Editor">
       <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Entities.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Entities.StaticTypeRegistry">
-      <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Entities.StaticTypeRegistry.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Burst.Editor">
       <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Burst.Editor.dll</HintPath>
     </Reference>
@@ -403,7 +400,7 @@
       <HintPath>D:/Projects/Share/DotTesting/Library/PackageCache/com.unity.burst@1.2.3/Unity.Burst.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>D:/Projects/Share/DotTesting/Library/PackageCache/com.unity.collections@0.5.2-preview.8/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <HintPath>D:/Projects/Share/DotTesting/Library/PackageCache/com.unity.collections@0.6.0-preview.9/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>D:/Projects/Share/DotTesting/Library/PackageCache/com.unity.nuget.newtonsoft-json@2.0.0-preview/Runtime/Newtonsoft.Json.dll</HintPath>

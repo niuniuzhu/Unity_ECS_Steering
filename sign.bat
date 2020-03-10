@@ -1,0 +1,1 @@
+jarsigner -keystore C:\Users\ron\user.keystore -signedjar DotTesting_il2cpp-signed.apk DotTesting_il2cpp.apk dotsteering
