@@ -1,5 +1,4 @@
-﻿using Unity.Collections;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -10,14 +9,14 @@ namespace Steering
 	[UpdateAfter( typeof( FindNeighbourSystem ) )]
 	[UpdateAfter( typeof( FindObstacleSystem ) )]
 	[UpdateAfter( typeof( FindWallSystem ) )]
-	public class SteeringSystem : JobComponentSystem
+	public class SteeringSystem : SystemBase
 	{
-		protected override JobHandle OnUpdate( JobHandle inputDeps )
+		protected override void OnUpdate()
 		{
 			var dt = Time.DeltaTime;
 			var random = Environment.random;
 
-			var jobHandle = Entities.ForEach( ( Entity vehicle, ref Translation translation, ref Rotation rotation,
+			Entities.ForEach( ( Entity vehicle, ref Translation translation, ref Rotation rotation,
 				   ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData,
 				   in DynamicBuffer<NeighbourElement> neighbours, in DynamicBuffer<ObstacleElement> obstacles ) =>
 			 {
@@ -46,9 +45,7 @@ namespace Steering
 					 entityData.position += movingData.velocity * dt;
 					 translation.Value = new float3( entityData.position.x, 0, entityData.position.y );
 				 }
-			 } ).Schedule( inputDeps );
-
-			return jobHandle;
+			 } ).ScheduleParallel();
 		}
 
 		#region 计算合操纵力

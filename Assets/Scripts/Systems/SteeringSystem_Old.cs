@@ -8,17 +8,17 @@ using static Steering.VehicleData;
 namespace Steering
 {
 	[DisableAutoCreation]
-	public class SteeringSystem_Old : JobComponentSystem
+	public class SteeringSystem_Old : SystemBase
 	{
 		protected override void OnDestroy()
 		{
 		}
 
-		protected override JobHandle OnUpdate( JobHandle inputDeps )
+		protected override void OnUpdate()
 		{
 			var dt = Time.DeltaTime;
 
-			var jobHandle = Entities.ForEach( ( Entity vehicle, ref Translation translation, ref Rotation rotation,
+			Entities.ForEach( ( Entity vehicle, ref Translation translation, ref Rotation rotation,
 				   ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData,
 				   ref DynamicBuffer<NeighbourElement> neighbours, ref DynamicBuffer<ObstacleElement> obstacles ) =>
 			{
@@ -45,9 +45,7 @@ namespace Steering
 				rotation.Value = quaternion.LookRotation( new float3( movingData.forward.x, 0, movingData.forward.y ), new float3( 0, 1, 0 ) );
 				entityData.position += movingData.velocity * dt;
 				translation.Value = new float3( entityData.position.x, 0, entityData.position.y );
-			} ).Schedule( inputDeps );
-
-			return jobHandle;
+			} ).ScheduleParallel();
 		}
 
 		#region 计算合操纵力

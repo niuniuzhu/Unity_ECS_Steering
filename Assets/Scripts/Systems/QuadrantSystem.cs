@@ -5,7 +5,7 @@ using Unity.Mathematics;
 
 namespace Steering
 {
-	public class QuadrantSystem : JobComponentSystem
+	public class QuadrantSystem : SystemBase
 	{
 		public static NativeMultiHashMap<int, CellEntityElement> cellEntityElementHashMap;
 
@@ -23,7 +23,7 @@ namespace Steering
 			base.OnDestroy();
 		}
 
-		protected override JobHandle OnUpdate( JobHandle inputDeps )
+		protected override void OnUpdate()
 		{
 			var cellSize = Environment.cellSize;
 			var offset = Environment.minXY;
@@ -35,18 +35,16 @@ namespace Steering
 				cellEntityElementHashMap.Capacity = entityQuery.CalculateEntityCount();
 			var parallelWriter = cellEntityElementHashMap.AsParallelWriter();
 
-			var jobHandle = this.Entities.WithAll<VehicleData>().ForEach( ( Entity entity, in EntityData entityData ) =>
-			 {
-				 var index = GetCellRawIndex( entityData.position, offset, numCell, cellSize );
-				 parallelWriter.Add( index, new CellEntityElement
-				 {
-					 entity = entity,
-					 position = entityData.position,
-					 radius = entityData.radius
-				 } );
-			 } ).Schedule( inputDeps );
-
-			return jobHandle;
+			this.Entities.WithAll<VehicleData>().ForEach( ( Entity entity, in EntityData entityData ) =>
+			{
+				var index = GetCellRawIndex( entityData.position, offset, numCell, cellSize );
+				parallelWriter.Add( index, new CellEntityElement
+				{
+					entity = entity,
+					position = entityData.position,
+					radius = entityData.radius
+				} );
+			} ).ScheduleParallel();
 		}
 
 		public static int GetCellRawIndex( float2 position, float2 offset, int2 numCell, float2 cellSize )

@@ -5,9 +5,9 @@ using Unity.Mathematics;
 
 namespace Steering
 {
-	public class FindObstacleSystem : JobComponentSystem
+	public class FindObstacleSystem : SystemBase
 	{
-		protected override JobHandle OnUpdate( JobHandle inputDeps )
+		protected override void OnUpdate()
 		{
 			var targetQuery = this.GetEntityQuery( typeof( ObstacleData ) );
 			var targetEntityDataArray = targetQuery.ToComponentDataArray<ObstacleData>( Allocator.TempJob );
@@ -18,7 +18,7 @@ namespace Steering
 
 			targetEntityDataArray.Dispose();
 
-			var jobHandle = Entities.ForEach( ( Entity vehicle, ref DynamicBuffer<ObstacleElement> obstacles,
+			Entities.ForEach( ( Entity vehicle, ref DynamicBuffer<ObstacleElement> obstacles,
 				in EntityData entityData, in MovingData movingData, in VehicleData vehicleData ) =>
 			 {
 				 obstacles.Clear();
@@ -46,11 +46,9 @@ namespace Steering
 							 } );
 					 }
 				 }
-			 } ).Schedule( inputDeps );
+			 } ).ScheduleParallel();
 
-			targetInfos.Dispose( jobHandle );
-
-			return jobHandle;
+			targetInfos.Dispose( this.Dependency );
 		}
 	}
 }

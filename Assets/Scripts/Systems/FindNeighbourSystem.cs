@@ -6,9 +6,9 @@ using Unity.Mathematics;
 namespace Steering
 {
 	[UpdateAfter( typeof( QuadrantSystem ) )]
-	public class FindNeighbourSystem : JobComponentSystem
+	public class FindNeighbourSystem : SystemBase
 	{
-		protected override JobHandle OnUpdate( JobHandle inputDeps )
+		protected override void OnUpdate()
 		{
 			var cellSize = Environment.cellSize;
 			var offset = Environment.minXY;
@@ -16,7 +16,7 @@ namespace Steering
 			var cellEntityElementHashMap = QuadrantSystem.cellEntityElementHashMap;
 			var cellIndexArray = new NativeArray<int>( Environment.numCell.x * Environment.numCell.y, Allocator.TempJob );
 
-			var jobHandle = Entities.WithAll<VehicleData>().WithReadOnly( cellEntityElementHashMap ).
+			Entities.WithAll<VehicleData>().WithReadOnly( cellEntityElementHashMap ).
 				ForEach( ( Entity vehicle, ref DynamicBuffer<NeighbourElement> neighbours, in EntityData entityData, in MovingData movingData ) =>
 			 {
 				 neighbours.Clear();
@@ -81,11 +81,9 @@ namespace Steering
 						 while ( cellEntityElementHashMap.TryGetNextValue( out cellEntityElement, ref nativeMultiHashMapIterator ) );
 					 }
 				 }
-			 } ).Schedule( inputDeps );
+			 } ).ScheduleParallel();
 
-			cellIndexArray.Dispose( jobHandle );
-
-			return jobHandle;
+			cellIndexArray.Dispose( this.Dependency );
 		}
 	}
 }

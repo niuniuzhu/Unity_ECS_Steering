@@ -96,7 +96,7 @@ MonoBehaviour:
   wanderDistance: 1
   wanderJitterPerSec: 2
   waypointSeekDistSquared: 4
-  summingMethod: 1
+  summingMethod: 0
   weightSeparation: 1
   weightCohesion: 2
   weightAlignment: 1
@@ -117,7 +117,7 @@ MonoBehaviour:
   targetPosition:
     x: 0
     y: 0
-  decelerationDistance: 0.5
+  decelerationDistance: 0
   offset:
     x: 0
     y: 0

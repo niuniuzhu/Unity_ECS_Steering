@@ -302,20 +302,20 @@ public class Bootstrap : MonoBehaviour
 
 	private void DebugDrawCells()
 	{
-		var manager = Environment.world.EntityManager;
-		var cellQuery = manager.CreateEntityQuery( typeof( CellData ) );
-		var cellDataArray = cellQuery.ToComponentDataArray<CellData>( Allocator.TempJob );
-		var count = cellDataArray.Length;
-		for ( int i = 0; i < count; i++ )
-		{
-			var cellData = cellDataArray[i];
-			var min = cellData.center - cellData.extends;
-			var max = cellData.center + cellData.extends;
-			Debug.DrawLine( new Vector3( min.x, 0, min.y ), new Vector3( min.x, 0, max.y ) );
-			Debug.DrawLine( new Vector3( min.x, 0, min.y ), new Vector3( max.x, 0, min.y ) );
-			Debug.DrawLine( new Vector3( max.x, 0, max.y ), new Vector3( min.x, 0, max.y ) );
-			Debug.DrawLine( new Vector3( max.x, 0, max.y ), new Vector3( max.x, 0, min.y ) );
-		}
-		cellDataArray.Dispose();
+		//var manager = Environment.world.EntityManager;
+		//var cellQuery = manager.CreateEntityQuery( typeof( CellData ) );
+		//var cellDataArray = cellQuery.ToComponentDataArray<CellData>( Allocator.Temp );
+		//var count = cellDataArray.Length;
+		//for ( int i = 0; i < count; i++ )
+		//{
+		//	var cellData = cellDataArray[i];
+		//	var min = cellData.center - cellData.extends;
+		//	var max = cellData.center + cellData.extends;
+		//	Debug.DrawLine( new Vector3( min.x, 0, min.y ), new Vector3( min.x, 0, max.y ) );
+		//	Debug.DrawLine( new Vector3( min.x, 0, min.y ), new Vector3( max.x, 0, min.y ) );
+		//	Debug.DrawLine( new Vector3( max.x, 0, max.y ), new Vector3( min.x, 0, max.y ) );
+		//	Debug.DrawLine( new Vector3( max.x, 0, max.y ), new Vector3( max.x, 0, min.y ) );
+		//}
+		//cellDataArray.Dispose();
 	}
 }

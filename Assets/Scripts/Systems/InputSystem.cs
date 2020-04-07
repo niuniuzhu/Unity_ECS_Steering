@@ -1,5 +1,4 @@
-﻿using System;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.Physics;
 using Unity.Physics.Systems;
 using UnityEngine;
@@ -7,7 +6,7 @@ using UnityEngine.InputSystem;
 
 namespace Steering
 {
-	public class InputSystem : ComponentSystem
+	public class InputSystem : SystemBase
 	{
 		private PlayerInput _inputAction;
 		private Vector2 _touchPosition;
@@ -59,7 +58,7 @@ namespace Steering
 				{
 					vehicleData.targetPosition = new Unity.Mathematics.float2( hit.Position.x, hit.Position.z );
 					SteeringSystem.ArriveOn( ref vehicleData );
-				} );
+				} ).Schedule();
 			}
 		}
 	}
