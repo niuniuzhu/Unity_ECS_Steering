@@ -13,6 +13,7 @@ namespace Steering
 	public struct CellEntityElement : IBufferElementData
 	{
 		public Entity entity;
+		public EntityData entityData;
 		public float2 position;
 		public float radius;
 	}

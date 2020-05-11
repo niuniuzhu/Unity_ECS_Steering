@@ -147,6 +147,7 @@ namespace Steering
 	public struct NeighbourElement : IBufferElementData
 	{
 		public Entity neighbour;
+		public EntityData neighbourData;
 	}
 
 	[InternalBufferCapacity( 10 )]

@@ -13,7 +13,7 @@ namespace Steering
         public InputActionAsset asset { get; }
         public @PlayerInput()
         {
-            asset = InputActionAsset.FromJson(@"{
+			this.asset = InputActionAsset.FromJson(@"{
     ""name"": ""PlayerInput"",
     ""maps"": [
         {
@@ -170,54 +170,54 @@ namespace Steering
         }
     ]
 }");
-            // Player
-            m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
-            m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
-            m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
+			// Player
+			this.m_Player = this.asset.FindActionMap("Player", throwIfNotFound: true);
+			this.m_Player_Fire = this.m_Player.FindAction("Fire", throwIfNotFound: true);
+			this.m_Player_Move = this.m_Player.FindAction("Move", throwIfNotFound: true);
         }
 
         public void Dispose()
         {
-            UnityEngine.Object.Destroy(asset);
+            UnityEngine.Object.Destroy( this.asset );
         }
 
         public InputBinding? bindingMask
         {
-            get => asset.bindingMask;
-            set => asset.bindingMask = value;
+            get => this.asset.bindingMask;
+            set => this.asset.bindingMask = value;
         }
 
         public ReadOnlyArray<InputDevice>? devices
         {
-            get => asset.devices;
-            set => asset.devices = value;
+            get => this.asset.devices;
+            set => this.asset.devices = value;
         }
 
-        public ReadOnlyArray<InputControlScheme> controlSchemes => asset.controlSchemes;
+        public ReadOnlyArray<InputControlScheme> controlSchemes => this.asset.controlSchemes;
 
         public bool Contains(InputAction action)
         {
-            return asset.Contains(action);
+            return this.asset.Contains(action);
         }
 
         public IEnumerator<InputAction> GetEnumerator()
         {
-            return asset.GetEnumerator();
+            return this.asset.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return this.GetEnumerator();
         }
 
         public void Enable()
         {
-            asset.Enable();
+			this.asset.Enable();
         }
 
         public void Disable()
         {
-            asset.Disable();
+			this.asset.Disable();
         }
 
         // Player
@@ -228,34 +228,34 @@ namespace Steering
         public struct PlayerActions
         {
             private @PlayerInput m_Wrapper;
-            public PlayerActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
-            public InputAction @Fire => m_Wrapper.m_Player_Fire;
-            public InputAction @Move => m_Wrapper.m_Player_Move;
-            public InputActionMap Get() { return m_Wrapper.m_Player; }
-            public void Enable() { Get().Enable(); }
-            public void Disable() { Get().Disable(); }
-            public bool enabled => Get().enabled;
+            public PlayerActions(@PlayerInput wrapper) { this.m_Wrapper = wrapper; }
+            public InputAction @Fire => this.m_Wrapper.m_Player_Fire;
+            public InputAction @Move => this.m_Wrapper.m_Player_Move;
+            public InputActionMap Get() { return this.m_Wrapper.m_Player; }
+            public void Enable() { this.Get().Enable(); }
+            public void Disable() { this.Get().Disable(); }
+            public bool enabled => this.Get().enabled;
             public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
             public void SetCallbacks(IPlayerActions instance)
             {
-                if (m_Wrapper.m_PlayerActionsCallbackInterface != null)
+                if ( this.m_Wrapper.m_PlayerActionsCallbackInterface != null)
                 {
-                    @Fire.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFire;
-                    @Fire.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFire;
-                    @Fire.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFire;
-                    @Move.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMove;
-                    @Move.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMove;
-                    @Move.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMove;
+					this.@Fire.started -= this.m_Wrapper.m_PlayerActionsCallbackInterface.OnFire;
+					this.@Fire.performed -= this.m_Wrapper.m_PlayerActionsCallbackInterface.OnFire;
+					this.@Fire.canceled -= this.m_Wrapper.m_PlayerActionsCallbackInterface.OnFire;
+					this.@Move.started -= this.m_Wrapper.m_PlayerActionsCallbackInterface.OnMove;
+					this.@Move.performed -= this.m_Wrapper.m_PlayerActionsCallbackInterface.OnMove;
+					this.@Move.canceled -= this.m_Wrapper.m_PlayerActionsCallbackInterface.OnMove;
                 }
-                m_Wrapper.m_PlayerActionsCallbackInterface = instance;
+				this.m_Wrapper.m_PlayerActionsCallbackInterface = instance;
                 if (instance != null)
                 {
-                    @Fire.started += instance.OnFire;
-                    @Fire.performed += instance.OnFire;
-                    @Fire.canceled += instance.OnFire;
-                    @Move.started += instance.OnMove;
-                    @Move.performed += instance.OnMove;
-                    @Move.canceled += instance.OnMove;
+					this.@Fire.started += instance.OnFire;
+					this.@Fire.performed += instance.OnFire;
+					this.@Fire.canceled += instance.OnFire;
+					this.@Move.started += instance.OnMove;
+					this.@Move.performed += instance.OnMove;
+					this.@Move.canceled += instance.OnMove;
                 }
             }
         }
@@ -265,8 +265,8 @@ namespace Steering
         {
             get
             {
-                if (m_KeyboardMouseSchemeIndex == -1) m_KeyboardMouseSchemeIndex = asset.FindControlSchemeIndex("Keyboard&Mouse");
-                return asset.controlSchemes[m_KeyboardMouseSchemeIndex];
+                if ( this.m_KeyboardMouseSchemeIndex == -1) this.m_KeyboardMouseSchemeIndex = this.asset.FindControlSchemeIndex("Keyboard&Mouse");
+                return this.asset.controlSchemes[this.m_KeyboardMouseSchemeIndex];
             }
         }
         private int m_GamepadSchemeIndex = -1;
@@ -274,8 +274,8 @@ namespace Steering
         {
             get
             {
-                if (m_GamepadSchemeIndex == -1) m_GamepadSchemeIndex = asset.FindControlSchemeIndex("Gamepad");
-                return asset.controlSchemes[m_GamepadSchemeIndex];
+                if ( this.m_GamepadSchemeIndex == -1) this.m_GamepadSchemeIndex = this.asset.FindControlSchemeIndex("Gamepad");
+                return this.asset.controlSchemes[this.m_GamepadSchemeIndex];
             }
         }
         private int m_TouchSchemeIndex = -1;
@@ -283,8 +283,8 @@ namespace Steering
         {
             get
             {
-                if (m_TouchSchemeIndex == -1) m_TouchSchemeIndex = asset.FindControlSchemeIndex("Touch");
-                return asset.controlSchemes[m_TouchSchemeIndex];
+                if ( this.m_TouchSchemeIndex == -1) this.m_TouchSchemeIndex = this.asset.FindControlSchemeIndex("Touch");
+                return this.asset.controlSchemes[this.m_TouchSchemeIndex];
             }
         }
         private int m_JoystickSchemeIndex = -1;
@@ -292,8 +292,8 @@ namespace Steering
         {
             get
             {
-                if (m_JoystickSchemeIndex == -1) m_JoystickSchemeIndex = asset.FindControlSchemeIndex("Joystick");
-                return asset.controlSchemes[m_JoystickSchemeIndex];
+                if ( this.m_JoystickSchemeIndex == -1) this.m_JoystickSchemeIndex = this.asset.FindControlSchemeIndex("Joystick");
+                return this.asset.controlSchemes[this.m_JoystickSchemeIndex];
             }
         }
         private int m_XRSchemeIndex = -1;
@@ -301,8 +301,8 @@ namespace Steering
         {
             get
             {
-                if (m_XRSchemeIndex == -1) m_XRSchemeIndex = asset.FindControlSchemeIndex("XR");
-                return asset.controlSchemes[m_XRSchemeIndex];
+                if ( this.m_XRSchemeIndex == -1) this.m_XRSchemeIndex = this.asset.FindControlSchemeIndex("XR");
+                return this.asset.controlSchemes[this.m_XRSchemeIndex];
             }
         }
         public interface IPlayerActions

@@ -16,9 +16,9 @@ namespace Steering
 
 		protected override void OnUpdate()
 		{
-			var dt = Time.DeltaTime;
+			var dt = this.Time.DeltaTime;
 
-			Entities.ForEach( ( Entity vehicle, ref Translation translation, ref Rotation rotation,
+			this.Entities.ForEach( ( Entity vehicle, ref Translation translation, ref Rotation rotation,
 				   ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData,
 				   ref DynamicBuffer<NeighbourElement> neighbours, ref DynamicBuffer<ObstacleElement> obstacles ) =>
 			{

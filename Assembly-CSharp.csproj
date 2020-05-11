@@ -79,6 +79,7 @@
     <Compile Include="Assets\Scripts\Misc\PlayerInput.cs" />
     <Compile Include="Assets\Scripts\Misc\TransformUtil.cs" />
     <Compile Include="Assets\Scripts\SteeringSettings.cs" />
+    <Compile Include="Assets\Scripts\Systems\CollisionSystem.cs" />
     <Compile Include="Assets\Scripts\Systems\FindNeighbourSystem.cs" />
     <Compile Include="Assets\Scripts\Systems\FindObstacleSystem.cs" />
     <Compile Include="Assets\Scripts\Systems\FindWallSystem.cs" />
@@ -102,9 +103,6 @@
     <Reference Include="Unity.VSCode.Editor">
       <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Entities.Properties">
-      <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Entities.Properties.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Jobs">
       <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Jobs.dll</HintPath>
     </Reference>
@@ -120,8 +118,17 @@
     <Reference Include="Unity.Collections">
       <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Properties.UI">
+      <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Properties.UI.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.InputSystem">
       <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.InputSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Serialization.Editor">
+      <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Serialization.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Properties">
+      <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Properties.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Scenes.Hybrid">
       <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Scenes.Hybrid.dll</HintPath>
@@ -165,6 +172,9 @@
     <Reference Include="Unity.AssetBundleBrowser.Editor">
       <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.AssetBundleBrowser.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Serialization">
+      <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Serialization.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Rider.Editor">
       <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
     </Reference>
@@ -177,14 +187,17 @@
     <Reference Include="Unity.Mathematics">
       <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Mathematics.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Properties">
-      <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Properties.dll</HintPath>
+    <Reference Include="Unity.Deformations">
+      <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Deformations.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Physics.Editor">
       <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Physics.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Sprite.Editor">
       <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Properties.UI.Editor">
+      <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.Properties.UI.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Tilemap.Editor">
       <HintPath>D:/Projects/Share/DotTesting/Library/ScriptAssemblies/Unity.2D.Tilemap.Editor.dll</HintPath>
@@ -403,10 +416,10 @@
       <HintPath>D:/Projects/Share/DotTesting/Library/PackageCache/com.unity.analytics@3.3.5/AnalyticsStandardEvents/Unity.Analytics.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Burst.Unsafe">
-      <HintPath>D:/Projects/Share/DotTesting/Library/PackageCache/com.unity.burst@1.3.0-preview.9/Unity.Burst.Unsafe.dll</HintPath>
+      <HintPath>D:/Projects/Share/DotTesting/Library/PackageCache/com.unity.burst@1.3.0-preview.11/Unity.Burst.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>D:/Projects/Share/DotTesting/Library/PackageCache/com.unity.collections@0.7.0-preview.2/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <HintPath>D:/Projects/Share/DotTesting/Library/PackageCache/com.unity.collections@0.8.0-preview.5/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>D:/Projects/Share/DotTesting/Library/PackageCache/com.unity.nuget.newtonsoft-json@2.0.0-preview/Runtime/Newtonsoft.Json.dll</HintPath>

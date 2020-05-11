@@ -161,7 +161,7 @@ namespace Steering
 		{
 			for ( int i = 0; i < vectors.Count; i++ )
 			{
-				vectors[i] = Apply( vectors[i] );
+				vectors[i] = this.Apply( vectors[i] );
 			}
 		}
 

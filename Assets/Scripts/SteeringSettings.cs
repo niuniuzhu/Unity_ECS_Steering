@@ -36,7 +36,7 @@
 		/// <summary>
 		/// Gets the weighting to apply to the "obstacle" steering behaviour.
 		/// </summary>
-		public const float ObstacleAvoidanceWeight = 10.0f * SteeringForceTweaker;
+		public const float ObstacleAvoidanceWeight = 1.0f * SteeringForceTweaker;
 
 		/// <summary>
 		/// Gets the weighting to apply to the "wall avoidance" steering behaviour.

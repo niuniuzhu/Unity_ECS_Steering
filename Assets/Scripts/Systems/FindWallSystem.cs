@@ -32,7 +32,7 @@ namespace Steering
 
 			var wallDetectionFeelers = new NativeArray<float2>( 3, Allocator.TempJob );
 
-			Entities.ForEach( ( Entity vehicle, ref VehicleData vehicleData, in EntityData entityData, in MovingData movingData ) =>
+			this.Entities.ForEach( ( Entity vehicle, ref VehicleData vehicleData, in EntityData entityData, in MovingData movingData ) =>
 			{
 				// feeler pointing straight in front
 				vehicleData.wallDetectionFeeler0 = entityData.position + movingData.forward * vehicleData.wallDetectionFeelerLength;

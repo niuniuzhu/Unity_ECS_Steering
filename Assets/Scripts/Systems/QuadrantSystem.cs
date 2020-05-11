@@ -41,6 +41,7 @@ namespace Steering
 				parallelWriter.Add( index, new CellEntityElement
 				{
 					entity = entity,
+					entityData = entityData,
 					position = entityData.position,
 					radius = entityData.radius
 				} );

@@ -54,7 +54,7 @@ namespace Steering
 			var physicsWorld = Environment.world.GetExistingSystem<BuildPhysicsWorld>().PhysicsWorld;
 			if ( physicsWorld.CastRay( input, out var hit ) )
 			{
-				Entities.ForEach( ( Entity vehicle, ref VehicleData vehicleData ) =>
+				this.Entities.ForEach( ( Entity vehicle, ref VehicleData vehicleData ) =>
 				{
 					vehicleData.targetPosition = new Unity.Mathematics.float2( hit.Position.x, hit.Position.z );
 					SteeringSystem.ArriveOn( ref vehicleData );

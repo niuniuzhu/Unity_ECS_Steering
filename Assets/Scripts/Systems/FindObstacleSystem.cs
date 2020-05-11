@@ -18,7 +18,7 @@ namespace Steering
 
 			targetEntityDataArray.Dispose();
 
-			Entities.ForEach( ( Entity vehicle, ref DynamicBuffer<ObstacleElement> obstacles,
+			this.Entities.ForEach( ( Entity vehicle, ref DynamicBuffer<ObstacleElement> obstacles,
 				in EntityData entityData, in MovingData movingData, in VehicleData vehicleData ) =>
 			 {
 				 obstacles.Clear();

@@ -16,7 +16,7 @@ namespace Steering
 			var cellEntityElementHashMap = QuadrantSystem.cellEntityElementHashMap;
 			var cellIndexArray = new NativeArray<int>( Environment.numCell.x * Environment.numCell.y, Allocator.TempJob );
 
-			Entities.WithAll<VehicleData>().WithReadOnly( cellEntityElementHashMap ).
+			this.Entities.WithAll<VehicleData>().WithReadOnly( cellEntityElementHashMap ).
 				ForEach( ( Entity vehicle, ref DynamicBuffer<NeighbourElement> neighbours, in EntityData entityData, in MovingData movingData ) =>
 			 {
 				 neighbours.Clear();
@@ -72,11 +72,12 @@ namespace Steering
 
 							 // if entity within range, tag for further consideration.
 							 // (working in distance-squared space to avoid sqrts)
-							 if ( math.lengthsq( to ) < totalRange * totalRange )
-							 {
-								 if ( neighbours.Length < 10 )
-									 neighbours.Add( new NeighbourElement() { neighbour = cellEntityElement.entity } );
-							 }
+							 if ( math.lengthsq( to ) < totalRange * totalRange /*&& neighbours.Length < 10 */)
+								 neighbours.Add( new NeighbourElement()
+								 {
+									 neighbour = cellEntityElement.entity,
+									 neighbourData = cellEntityElement.entityData
+								 } );
 						 }
 						 while ( cellEntityElementHashMap.TryGetNextValue( out cellEntityElement, ref nativeMultiHashMapIterator ) );
 					 }

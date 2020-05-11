@@ -13,15 +13,15 @@ namespace Steering
 	{
 		protected override void OnUpdate()
 		{
-			var dt = Time.DeltaTime;
+			var dt = this.Time.DeltaTime;
 			var random = Environment.random;
 
-			Entities.ForEach( ( Entity vehicle, ref Translation translation, ref Rotation rotation,
-				   ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData,
+			this.Entities.ForEach( ( Entity vehicle, ref Translation translation, ref Rotation rotation,
+				   ref EntityData entityData, ref MovingData movingData, in VehicleData vehicleData,
 				   in DynamicBuffer<NeighbourElement> neighbours, in DynamicBuffer<ObstacleElement> obstacles ) =>
 			 {
 				 //计算速度
-				 var steeringForce = Calculate( ref entityData, ref movingData, ref vehicleData, in neighbours, in obstacles, random );
+				 var steeringForce = Calculate( ref entityData, movingData, vehicleData, neighbours, obstacles, random );
 				 var acceleration = steeringForce / movingData.mass;
 				 movingData.velocity += acceleration * dt;
 
@@ -54,18 +54,18 @@ namespace Steering
 		/// </summary>
 		/// <param name="vehicle">智能体</param>
 		/// <returns>合操纵力</returns>
-		public static float2 Calculate( ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData,
+		public static float2 Calculate( ref EntityData entityData, in MovingData movingData, in VehicleData vehicleData,
 			in DynamicBuffer<NeighbourElement> neighbours, in DynamicBuffer<ObstacleElement> obstacles, Random random )
 		{
 			var steeringForce = float2.zero;
 			switch ( vehicleData.summingMethod )
 			{
 				case SummingMethod.WeightedAverage:
-					steeringForce = CalculateWeightedSum( ref entityData, ref movingData, ref vehicleData, in neighbours, in obstacles, random );
+					steeringForce = CalculateWeightedSum( ref entityData, movingData, vehicleData, neighbours, obstacles, random );
 					break;
 
 				case SummingMethod.Prioritized:
-					steeringForce = CalculatePrioritized( ref entityData, ref movingData, ref vehicleData, in neighbours, in obstacles, random );
+					steeringForce = CalculatePrioritized( ref entityData, movingData, vehicleData, neighbours, obstacles, random );
 					break;
 			}
 
@@ -76,7 +76,7 @@ namespace Steering
 		/// 计算合操纵力
 		/// </summary>
 		/// <returns>合操纵力</returns>
-		private static float2 CalculateWeightedSum( ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData,
+		private static float2 CalculateWeightedSum( ref EntityData entityData, in MovingData movingData, in VehicleData vehicleData,
 			in DynamicBuffer<NeighbourElement> neighbours, in DynamicBuffer<ObstacleElement> obstacles, Random random )
 		{
 			var steeringForce = float2.zero;
@@ -117,7 +117,7 @@ namespace Steering
 		/// 达到指定值时，函数将返回转向力
 		/// </summary>
 		/// <returns>合操纵力</returns>
-		private static float2 CalculatePrioritized( ref EntityData entityData, ref MovingData movingData, ref VehicleData vehicleData,
+		private static float2 CalculatePrioritized( ref EntityData entityData, in MovingData movingData, in VehicleData vehicleData,
 			in DynamicBuffer<NeighbourElement> neighbours, in DynamicBuffer<ObstacleElement> obstacles, Random random )
 		{
 			float2 force;
@@ -235,17 +235,12 @@ namespace Steering
 		private static float2 Arrive( float2 targetPos, in EntityData entityData, in MovingData movingData, in VehicleData vehicleData )
 		{
 			var toTarget = targetPos - entityData.position;
-			var dist = math.lengthsq( toTarget );
+			var dist = math.length( toTarget );
 
-			if ( dist <= 0.04f )
-				return -movingData.velocity;
+			var rampedSpeed = movingData.maxSpeed * dist / vehicleData.decelerationDistance;
+			var clippedSpeed = math.min( movingData.maxSpeed, rampedSpeed );
 
-			float speed = movingData.maxSpeed;
-			if ( dist < vehicleData.decelerationDistance * vehicleData.decelerationDistance )
-				speed = movingData.maxSpeed * dist / vehicleData.decelerationDistance;
-
-			var dir = toTarget / math.sqrt( dist );
-			var desiredVelocity = dir * speed;
+			var desiredVelocity = clippedSpeed / dist * toTarget;
 
 			//// calculate the speed required to reach the target given the desired
 			//// deceleration
@@ -284,6 +279,11 @@ namespace Steering
 			// and steer towards it
 			return target - entityData.position;
 		}
+
+		//private static float2 Constrain( ref MovingData movingData, in DynamicBuffer<NeighbourElement> neighbours )
+		//{
+
+		//}
 
 		/// <summary>
 		/// 逃避障碍物
