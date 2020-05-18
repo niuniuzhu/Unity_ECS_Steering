@@ -16,6 +16,10 @@ public class Bootstrap : MonoBehaviour
 	public Mesh mesh;
 	public Material material;
 	public int amount;
+	public float minSpeed;
+	public float maxSpeed;
+	public float minMass;
+	public float maxMass;
 
 	//walls
 	public GameObject wallPrefab;
@@ -243,21 +247,33 @@ public class Bootstrap : MonoBehaviour
 		manager.Instantiate( entityPrefab, vehicles );
 		manager.DestroyEntity( entityPrefab );
 
+		var rnd = new System.Random();
 		for ( int i = 0; i < this.amount; i++ )
 		{
 			var vehicle = vehicles[i];
 
-			var radius = manager.GetComponentData<EntityData>( vehicle ).radius;
+			var entityData = manager.GetComponentData<EntityData>( vehicle );
+			var mass = ( float )rnd.NextDouble() * ( this.maxMass - this.minMass ) + this.minMass;
+			var radius = entityData.radius * mass * 0.5f;
 			var wallBorderSize = this.wallBorderSize * 0.5f;
 			var position = new Vector3( UnityEngine.Random.Range( this.minXY.x + wallBorderSize + radius, this.maxXY.x - wallBorderSize - radius ), 0,
 				UnityEngine.Random.Range( this.minXY.y + wallBorderSize + radius, this.maxXY.y - wallBorderSize - radius ) );
 			var rotation = quaternion.AxisAngle( new float3( 0, 1, 0 ), math.radians( UnityEngine.Random.Range( 0, 360 ) ) );
-			var forward = math.forward( rotation );
+
+			entityData = new EntityData
+			{
+				position = new float2( position.x, position.z ),
+				radius = radius,
+				mass = mass
+			};
+			manager.SetComponentData( vehicle, entityData );
+			manager.SetComponentData( vehicle, new Translation { Value = position } );
+			manager.SetComponentData( vehicle, new Rotation { Value = rotation } );
+			manager.AddComponent<Scale>( vehicle );
+			manager.SetComponentData( vehicle, new Scale { Value = entityData.mass * 0.5f } );
 
 			manager.AddBuffer<NeighbourElement>( vehicle );
 			manager.AddBuffer<ObstacleElement>( vehicle );
-			manager.SetComponentData( vehicle, new Translation { Value = position } );
-			manager.SetComponentData( vehicle, new Rotation { Value = rotation } );
 			manager.AddSharedComponentData( vehicle, new RenderMesh
 			{
 				mesh = this.mesh,
@@ -267,8 +283,9 @@ public class Bootstrap : MonoBehaviour
 			} );
 			manager.AddComponent<RenderBounds>( vehicle );
 			manager.AddComponent<WorldRenderBounds>( vehicle );
-			manager.SetComponentData( vehicle, new EntityData { position = new float2( position.x, position.z ), radius = radius } );
+			var forward = math.forward( rotation );
 			var movingData = manager.GetComponentData<MovingData>( vehicle );
+			movingData.maxSpeed = ( float )rnd.NextDouble() * ( this.maxSpeed - this.minSpeed ) + this.minSpeed;
 			movingData.forward = new float2( forward.x, forward.z );
 			movingData.right = new float2( forward.z, -forward.x );
 			//movingData.velocity = movingData.forward * movingData.maxSpeed;

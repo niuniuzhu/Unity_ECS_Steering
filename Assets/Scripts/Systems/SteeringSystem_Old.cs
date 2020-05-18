@@ -24,7 +24,7 @@ namespace Steering
 			{
 				//计算速度
 				var steeringForce = Calculate( ref entityData, ref movingData, ref vehicleData, ref neighbours, ref obstacles );
-				var acceleration = steeringForce / movingData.mass;
+				var acceleration = steeringForce / entityData.mass;
 				movingData.velocity += acceleration * dt;
 
 				//计算速率

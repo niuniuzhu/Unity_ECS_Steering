@@ -378,8 +378,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RepeatDelay: 0.5
-  m_RepeatRate: 0.1
+  m_MoveRepeatDelay: 0.5
+  m_MoveRepeatRate: 0.1
+  m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
   m_PointAction: {fileID: 1054132383583890850, guid: ca9f5fa95ffab41fb9a615ab714db018,
     type: 3}
   m_MoveAction: {fileID: 3710738434707379630, guid: ca9f5fa95ffab41fb9a615ab714db018,
@@ -400,11 +402,8 @@ MonoBehaviour:
     type: 3}
   m_TrackedDeviceOrientationAction: {fileID: 1025543830046995696, guid: ca9f5fa95ffab41fb9a615ab714db018,
     type: 3}
-  m_TrackedDeviceSelectAction: {fileID: 2559092417903258184, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
   m_DeselectOnBackgroundClick: 1
+  m_PointerBehavior: 0
 --- !u!114 &129110738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -469,6 +468,10 @@ MonoBehaviour:
   mesh: {fileID: 0}
   material: {fileID: 2100000, guid: d19435ea5dc565f498d4367ce7becd00, type: 2}
   amount: 100
+  minSpeed: 0.2
+  maxSpeed: 5
+  minMass: 1
+  maxMass: 3
   wallPrefab: {fileID: 6150156303732565994, guid: 63522f519cf85dd4eb2e9c7d17286b21,
     type: 3}
   minXY:
@@ -482,9 +485,9 @@ MonoBehaviour:
   numCellZ: 9
   obstacleMesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
   obstacleMaterial: {fileID: 2100000, guid: c22c16f9f28e1e5409775262597f58af, type: 2}
-  numObstacles: 5
-  minObstacleRadius: 0.5
-  maxObstacleRadius: 1.5
+  numObstacles: 0
+  minObstacleRadius: 0.3
+  maxObstacleRadius: 1
   obstacleMinSeparation: 2.5
   obstacleBorder: 0.2
 --- !u!4 &279089596

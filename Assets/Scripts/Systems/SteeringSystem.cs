@@ -22,7 +22,7 @@ namespace Steering
 			 {
 				 //计算速度
 				 var steeringForce = Calculate( ref entityData, movingData, vehicleData, neighbours, obstacles, random );
-				 var acceleration = steeringForce / movingData.mass;
+				 var acceleration = steeringForce/* / entityData.mass*/;
 				 movingData.velocity += acceleration * dt;
 
 				 //计算速率
@@ -237,10 +237,11 @@ namespace Steering
 			var toTarget = targetPos - entityData.position;
 			var dist = math.length( toTarget );
 
-			var rampedSpeed = movingData.maxSpeed * dist / vehicleData.decelerationDistance;
-			var clippedSpeed = math.min( movingData.maxSpeed, rampedSpeed );
-
-			var desiredVelocity = clippedSpeed / dist * toTarget;
+			var desiredVelocity = toTarget / dist;
+			if ( dist > vehicleData.decelerationDistance )
+				desiredVelocity *= movingData.maxSpeed;
+			else
+				desiredVelocity *= ( movingData.maxSpeed * dist / vehicleData.decelerationDistance );
 
 			//// calculate the speed required to reach the target given the desired
 			//// deceleration

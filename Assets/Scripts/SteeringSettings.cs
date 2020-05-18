@@ -5,7 +5,7 @@
 		/// <summary>
 		/// 用于避障转向行为的检测盒的长度
 		/// </summary>
-		public const float MinDetectionBoxLength = 1.0f;
+		public const float MinDetectionBoxLength = 0.5f;
 
 		/// <summary>
 		/// Gets the length of the feelers to use in the wall avoidance steering behaviour.

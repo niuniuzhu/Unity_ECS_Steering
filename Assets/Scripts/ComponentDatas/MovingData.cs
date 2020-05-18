@@ -44,10 +44,6 @@ namespace Steering
 		/// </summary>
 		public float maxTurnRate;
 		/// <summary>
-		/// 重量
-		/// </summary>
-		public float mass;
-		/// <summary>
 		/// 视野距离
 		/// </summary>
 		public float viewDistance;

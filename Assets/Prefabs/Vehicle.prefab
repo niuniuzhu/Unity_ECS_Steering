@@ -49,6 +49,7 @@ MonoBehaviour:
     x: 0
     y: 0
   radius: 0.5
+  mass: 1
 --- !u!114 &9007561832718460696
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75,10 +76,9 @@ MonoBehaviour:
     x: 0
     y: 0
   speed: 0
-  maxSpeed: 2
+  maxSpeed: 1
   maxForce: 5
   maxTurnRate: 3.141592
-  mass: 0.1
   viewDistance: 2
 --- !u!114 &2513071525747079500
 MonoBehaviour:
@@ -101,7 +101,7 @@ MonoBehaviour:
   weightCohesion: 2
   weightAlignment: 1
   weightWander: 1
-  weightObstacleAvoidance: 10
+  weightObstacleAvoidance: 1
   weightWallAvoidance: 10
   weightSeek: 1
   weightFlee: 1
@@ -117,7 +117,7 @@ MonoBehaviour:
   targetPosition:
     x: 0
     y: 0
-  decelerationDistance: 0
+  decelerationDistance: 1
   offset:
     x: 0
     y: 0
